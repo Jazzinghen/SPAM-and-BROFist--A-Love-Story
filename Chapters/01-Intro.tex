@@ -21,9 +21,9 @@ pi\'u integrate nella vita di tutti i giorni, senza che l'utente finale si
 accorga della loro presenza.
 
 Programmare applicazioni per questi sistemi pu\'o essere
-estremamente complicato, soprattutto per i programmatori meno esperti
-oppure che non hanno mai lavorato in ambienti particolari come quelli
-richiesti in questo caso.
+estremamente complicato, soprattutto per coloro che sono meno esperti nella
+programmazione o che sono abituati a produrre software per piattaforme di
+alto livello.
 
 \graffito{Le difficolt\'a derivanti dalla programmazione di software per sistemi
 Embedded} Il problema derivante dalla programmazzione di software per
@@ -139,8 +139,16 @@ parti:
     \item[TOPPERS/JSP]fornisce un ambiente real-time multitasking basato
         sulle specifiche giapponesi \emph{$\mu$ITRON}.
 \end{description}
-Grazie all'unione di queste features \emph{nxtOSEK} fornisce un ambiente di
-sviluppo Real Time in Ansi C / C++, quindi \'e la scelta migliore per il nostro scopo.
+Grazie all'unione di queste features e all'utilizzo di una toolchain GCC
+per ARM \emph{nxtOSEK} fornisce un ambiente di sviluppo Real Time in Ansi C
+/ C++.
+
+Tutto questo assieme si rivela essere la miglior scelta, in quanto, oltre
+a non necessitare di un periodo di training per imprare un linguaggio
+specifico per sviluppare il client per la comunicazione con l'ambiente di
+sviluppo grafico, permetter\'a, in futuro, di utilizzare sistemi di
+generazione automatica di codice coi quali trasformare dei modelli visivi
+direttamente in applicazioni per \emph{nxtOSEK}.
 
 \section{Ambiente di Sviluppo Grafico}
 Come detto sopra la programmazione di basso livello su piattaforme
@@ -170,13 +178,44 @@ sistemi dinamici. Siccome tutto il progetto faceva uso
 di strumenti OpenSource \'e stato deciso di mantenere questa linea fino in
 fondo.
 
-\subsection{Il sistema di Logging}
+\section{Il sistema di Logging}
 In \nxtOSEK{} (O sugli altri sistemi testati, per quato ho potuto
 constatare) non \'e possibile scrivere files sulla memoria dell'unit\'a per
 poi recuperarli in futuro ed utilizzare i dati di logging per debug oppure
 per fine tuning del sistema. \'E Per questo che si rende necessario lo
-sviluppo di un protocollo di comunicazione via BlueTooth che permette la
-richiesta di dati 
+sviluppo di un protocollo di comunicazione via BlueTooth col quale
+richiedere i dati letti dai sensori per utilizzarli a fine di \emph{debug},
+\emph{Fine tuning} oppure \emph{controllo diretto utilizzando i dati
+ricevuti}.
+
+\graffito{BROFist}Oltre a questo era necessario incorporare in questo
+protocollo anche una codifica per il controllo dei servo motori, cos\'i da
+poter controllare completamente (per quanto riguarda motori e sensori,
+ovviamente) l'unit\'a NXT da remoto.
+
+A questo protocollo ho dato il nome di \BROFist{}: BROFist - Robot
+Operational Fist, che sta ad indicare il rapporto di fratellanza che si
+crea tra Robot e Computer grazie al suo utilizzo.
+
+\subsection{Il problema del controllo remoto via BlueTooth}
+Bisogna ammettere, per\'o, che questo sistema ha una debolezza. A causa di
+una gestione non molto ``furba'' del \emph{DMA} sull'unit\'a NXT e di un
+device per il controllo del BlueTooth non efficente la latenza delle
+comunicazioni rasenta i 45ms.
+
+Una latenza di questo tipo non sarebbe un problema se si volesse utilizzare
+il sistema solo per il plotting o per il logging dei dati letti dai
+sensori, per\'o pu\'o essere problematica in caso di implementazione di
+\emph{PID Controller} o altri sistemi di controllo digitale che richiedono
+una responsivit\'a maggiore.
+
+\section{Il BROFist Client per lo SPAM}
+L'ultimo passo \'e stato quello di scrivere il client per l'interpretazione
+dei \emph{BROFists}, oltre che di controllo della velocit\'a dei motori.
+
+Il client \'e un applicazione formata da varie 
+
+\cleardoublepage
 
 %\begin{code}%{Test Code :D}{TestCode}
 %for (i=0; i <= MAX_DATA; i++) {
