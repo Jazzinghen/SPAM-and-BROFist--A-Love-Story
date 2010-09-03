@@ -1,0 +1,185 @@
+\chapter{Introduzione}
+\section{I sistemi Embedded}
+\graffito{I sistemi Embedded nella vita di tutti i giorni}
+Negli ultimi tempi le vere rivoluzioni tecnologiche si sono sempre
+dimostrate quelle riguardanti l'integrazione di device nella vita di tutti
+i giorni senza che le persone che ne usufruiscono si accorgano della loro
+presenza. Basta pensare alla enorme quantit\'a di device con la quale ci
+siamo abituati a convivere, quali navigatori satellitari che stanno nel
+palmo della mano oppure integrati all'interno degli smartphone, ormai
+potenti quanto PC, oppure ancora alla presenza di sistemi di controllo
+elettronici per la stabilit\'a all'interno delle macchine.
+
+Tutti questi sistemi fanno parte di una categoria di sistemi
+microprogrammati creati specificatamente per eseguire una oppure un numero
+limitato di funzioni: i sistemi Embedded. Questi spaziano dalla robotica
+all'Entertainment portatile, dalla medicina all'applicazione in campo
+militare. \'E per questo che si fa sempre pi\'u necessario avere competenze
+in questo campo, in quanto la richiesta \'e destinata ad aumentare,
+come aumenter\'a la necessit\'a di avere strumentazioni tecnologiche sempre
+pi\'u integrate nella vita di tutti i giorni, senza che l'utente finale si
+accorga della loro presenza.
+
+Programmare applicazioni per questi sistemi pu\'o essere
+estremamente complicato, soprattutto per i programmatori meno esperti
+oppure che non hanno mai lavorato in ambienti particolari come quelli
+richiesti in questo caso.
+
+\graffito{Le difficolt\'a derivanti dalla programmazione di software per sistemi
+Embedded} Il problema derivante dalla programmazzione di software per
+sistemi Embedded \'e la necessit\'a di lavorare con risorse limitate.
+Questo non permette una grande astrazione del codice, richiedendo al
+programmatore delle competenze specifiche in linguaggi di basso livello.
+Inoltre il debugging di questo tipo di piattaforme pu\'o essere complicato
+o, in alcuni casi, impossibile visto che potrebbero non essere disponibili
+periferiche di comunicazione con il programmatore oppure metodi per
+recuperare file di log direttamente dalla memoria del sistema.
+
+Siccome molto spesso pu\'o essere un'attivit\'a che richiede molto tempo
+conseguire le abilit\'a necessarie per programmare in maniera corretta su
+piattaforme di questo tipo \'e utile avere una piattaforma di sviluppo
+sulla quale formare le proprie competenze in questo campo per poi passare
+allo sviluppo a basso livello.
+
+\graffito{L'idea alla base}
+L'idea, dunque, \'e quella di creare un set di strumenti atto allo
+spostamento dello sviluppo di software per piattaforme Embedded su un
+applicazione di modellazione e simulazione di sistemi dinamici ed avere un
+feedback istantaneo. Questo differisce dal metodo tradizionale di modellazione
+in quanto permette l'utilizzo di dati influenzati da fattori esterni, quali
+la carica della batteria dell'unit\'a, l'attrito intrinseco dei motori, il
+quale varia da motore a motore, la presenza di ostacoli e cos\'i via.
+
+Questo permetterebbe, quindi, uno sviluppo di software basato su \emph{real
+case scenarios} invece che su simulazioni in ambienti protetti dove l'unico
+modo per rendere pi\'u realistica la simulazione sarebbe introdurre degli
+elementi esterni ``fittizi'', oppure scrivere il codice relativo al modello
+creato, testarlo sulla piattaforma Embedded registrando tutti i dati per
+una seconda analisi e quindi modificare il modello di conseguenza.
+
+\graffito{Scegliere gli strumenti}Per questo scopo la scelta di strumenti
+di sviluppo corretti \'e un punto cruciale. Sono due le scelte che vanno
+fatte, ovvero la piattaforma \emph{hardware}, quella \emph{software} che
+poi dovr\'a venir installata sulla prima ed, infine, un \emph{pacchetto di
+modellazione e simulazione di sistemi dinamici}.
+
+Inoltre, una volta effettuate tutte queste scelte, andr\'a sviluppato un
+sistema per l'interfacciamento della piattaforma Embedded con il software
+di simulazione.
+
+\section{La piattaforma Hardware}
+La prima scelta da effettuare, dunque, \'e quale piattaforma hardware
+utilizzare per apprendere delle competenze di base nella programmazione
+Embedded.
+
+L'idea che sta alla base dei sistemi Embedded \'e, come detto sopra, che le
+piattaforme hardware vengono progettate per un compito specifico, quindi
+progettare specificatamente una piattaforma per questo scopo sarebbe una
+spesa inutilmente grande.
+
+\subsection{Lego MINDSTORMS NXT}
+La scelta della piattaforma hardware non \'e stata una procedura lunga in
+quanto sul commercio esiste una piattaforma di tipo Embedded con un costo
+relativamente contenuto e di ampia distribuzione: i \nxt.
+
+Questa \'e una linea di prodotti della Lego
+ideata per la costruzione di robot e altri sistemi automatici o
+interattivi. \graffito{ATMEL AT91SAM7S256} Il nucleo di controllo per i
+\nxt{} \'e un micro computer basato sull'\emph{AT91SAM7S256}, un
+microcontrollore multi-purpose della \emph{ATMEL}. Questa piattaforma
+dispone, oltre che ad una connessione USB, di controller Bluetooth, I2C ed
+RS485.
+
+La piattaforma \emph{AT91SAM7S256} \'e basata su un processore
+\emph{ARM7}, utilizzato gi\'a in vari prodotti di grande distribuzione,
+quali:
+\begin{itemize}
+    \item Il \emph{Sega Dreamcast}
+    \item L'\emph{Apple iPod}
+    \item Il \emph{Nintendo DS} ed il \emph{Nintendo GBA}
+    \item La maggior parte dei telefoni portatili della \emph{Nokia}
+    \item Una gran quantit\'a di modelli di automobili.
+\end{itemize}
+Dunque questa piattaforma, oltre ad essere facilmente reperibile, presenta
+anche un esempio di hardware che potrebbe venir realmente usato per lo
+sviluppo di device Embedded. Inoltre i \nxt{} vengono utilizzati spesso
+nelle scuole ed in luoghi come i musei di scienze per scopi didattici,
+anche grazie all'interfaccia di programmazione visiva. Questa interfaccia,
+per\'o risulta essere estremamente limitata appena bisogna sviluppare
+qualcosa di complesso, come un client per la comunicazione
+\emph{BlueTooth}.
+
+\section{La piattaforma Software}
+Una volta deciso su quale piattaforma hardware operare la scelta successiva
+era quella di quale sistema software montare su di essa per avere il
+controllo corretto dei sensori e dei servo motori. Le scelte vagliate sono
+state fondamentalmente tre:
+\begin{description}
+    \item[nxOS]un sistema operativo per \nxt{} scritto da David Anderson,
+    il quale, per\'o non sta pi\'u venendo aggiornato da maggio del 2009
+    \item[NBC \& NXC]due ``dialetti'' derivati, il primo,
+    dall'\emph{Assembly} e, il secondo, dal \emph{C}.
+    \item[nxtOSEK]un sistema operativo basato su specifiche \emph{OSEK}
+    sviluppato da Takashi Chikamasa.
+\end{description}
+Dopo una lunga ricerca e svariati test effettuati su queste piattaforme
+Software la scelta \'e ricaduta sul sistema \emph{nxtOSEK}.
+
+\subsection{nxtOSEK}
+\nxtOSEK{} \'e una piattaforma open source per i \nxt{} formata da tre
+parti:
+\begin{description}
+    \item[Device Drivers]in C/Assembly di \emph{leJOS NXJ}, un firmware di
+        rimpiazzo per i \nxt{} basato su \emph{Java}
+    \item[TOPPERS/ATK]conosciuto come \emph{TOPPERS/OSEK}, visto che
+        segue le specifiche \emph{OSEK}, uno standard per sistemi
+        operativi, stack di comunicazione e protocolli di rete per sistemi
+        embedded. Questo fornisce un ambiente real-time multitaking che
+        segue queste specifiche.
+    \item[TOPPERS/JSP]fornisce un ambiente real-time multitasking basato
+        sulle specifiche giapponesi \emph{$\mu$ITRON}.
+\end{description}
+Grazie all'unione di queste features \emph{nxtOSEK} fornisce un ambiente di
+sviluppo Real Time in Ansi C / C++, quindi \'e la scelta migliore per il nostro scopo.
+
+\section{Ambiente di Sviluppo Grafico}
+Come detto sopra la programmazione di basso livello su piattaforme
+Embedded \'e complicata e, soprattutto, richiede un gran numero di trial
+and error con un feedback minimo da parte della piattaforma. Per questo si
+rende necessario un sistema pi\'u facile e pi\'u intuitivo per la
+realizzazione di applicazioni su sistemi Embedded, oltre che ad un sistema
+per il logging di ci\'o che accade sull'unit\'a NXT.
+
+\subsection{Strumento di Modellazione e Simulazione}
+In un gran numero di ambienti di ricerca per la simulazione e la
+progettazione di sistemi Embedded viene utilizzato
+\emph{Matlab}, un ambiente per la computazione numerica, assieme a \emph
+{Simulink}, un pacchetto per la modellazione e la simulazione di sistemi
+Dinamici ed Embedded.
+
+Questo permette a persone esperte nella
+modellizzazione di sistemi elettronici di creare dei modelli teorici di
+software per piattaforme Embedded e poi testarli senza dover scrivere il
+codice, eliminando la necessit\'a di avere delle competenze da
+programmatori.
+
+\graffito{L'uso di SciCosLab}
+Esiste comunque un'alternativa OpenSource a Matlab, ovvero \emph{SciCosLab},
+il quale \'e a sua volta un pacchetto di modellazione e simulazione di
+sistemi dinamici. Siccome tutto il progetto faceva uso
+di strumenti OpenSource \'e stato deciso di mantenere questa linea fino in
+fondo.
+
+\subsection{Il sistema di Logging}
+In \nxtOSEK{} (O sugli altri sistemi testati, per quato ho potuto
+constatare) non \'e possibile scrivere files sulla memoria dell'unit\'a per
+poi recuperarli in futuro ed utilizzare i dati di logging per debug oppure
+per fine tuning del sistema. \'E Per questo che si rende necessario lo
+sviluppo di un protocollo di comunicazione via BlueTooth che permette la
+richiesta di dati 
+
+%\begin{code}%{Test Code :D}{TestCode}
+%for (i=0; i <= MAX_DATA; i++) {
+%    printf("Questo e` il %i dato.\n", i);
+%}
+%\end{code}

@@ -1,0 +1,26 @@
+%\documentclass[10pt,a4paper]{scrartcl}
+\documentclass[10pt,a4paper,cleardoubleempty]{scrbook}
+
+%\documentclass[]{scrreprt} % classe report di KOMA-Script
+%\documentclass[h. . .i]{scrbook} % classe book di KOMA-Script
+\usepackage{}
+\usepackage[]{classicthesis-ldpkg}
+\usepackage[parts,linedheaders,pdfspacing]{classicthesis}
+\usepackage[italian]{babel}
+\usepackage{indentfirst}
+\lstset{language=C,
+        showspaces=false,
+        showtabs=false,
+        showstringspaces=false,
+        basicstyle=\footnotesize,
+        numberstyle=\footnotesize,
+        frame=single}
+\input{VariousStuff/defines}
+\usepackage{}
+\author{Michele "Jazzinghen" Bianchi}
+\title{Sviluppo di Strumenti didattici per la programmazione Embedded}
+\begin{document}
+    \tableofcontents
+    \cleardoublepage
+    \input{Chapters/01-Intro}
+\end{document}
