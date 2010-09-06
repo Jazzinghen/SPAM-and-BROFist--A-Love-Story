@@ -1,10 +1,90 @@
 \chapter{Background}
 
 In questo capitolo parleremo del background tecnico e culturale che sta
-dietro a questo progetto. Ci sar\'a spazio per una breve storia dei \nxt{}
-e delle veloci nozioni riguardanti al \PID{}.
+dietro a questo progetto. Ci sar\'a spazio per una breve storia dei \nxt{}, 
+delle veloci nozioni riguardanti al \PID{} e del \emph{Bluetooth}.
 
-\section{La Lego, i Mindstorms e gli NXT}
-Dal
+\section{I MINDSTORMS e gli NXT}
+I \nxt{} sono l'ultima incarnazione di una serie di prodotti creati
+dalla \emph{Lego}, la quale affonda le sue radici da una serie di sensori
+programmabili venduti prima del 1998 dalla \emph{Lego}.
+
+\subsection{Storia dei Lego MINDSTORMS}
+La prima versione
+della serie si chiamava \RIS{} ed \'e stata rilasciata sul mercato nel
+1998, seguita poi nel 2006 dalla versione \emph{MINDSTORMS NXT}. Nel 2009
+\'e stata pubblicata l'ultima edizione, chiamata \emph{MINDSTORMS NXT 2.0}.
+
+\graffito{Le origini, prima della \emph{Lego}}
+La base hardware e software della prima versione dei \emph{Lego Mindstorms}
+\'e derivata direttamente dal lavoro dell'\emph{MIT Media Lab}, i quali
+avevano creato dei brick programmabili a scopo didattico. Questi erano stati 
+programmati in \emph{Lego Logo} ed avevano un ambiente di sviluppo grafico
+creato appositamente dalla \emph{Universit\'a del Colorado} nel 1994 con il
+nome di \emph{LEGOSheets}.
+
+\graffito{I vari contenuti dei kits dei \emph{Lego Mindstorms}}
+Non tutte le versioni dei \emph{Lego Mindstorms} hanno avuto le stesse
+dotazioni in campo di sensori e servo motori. La prima versione chiamata
+\RIS{}, conteneva due motori, due sensori di tocco ed un
+sensore di luce. La versione \emph{NXT} conteneva, invece, due \emph{Servo}
+Motori, un sensore di luce, uno di tocco, uno sonoro ed uno di distanza.
+L'ultima versione, infine, ha la stessa dotazione di quella precedente,
+solo con due sensori di tocco invece di uno soltanto. 
+
+\graffito{L'uso dei \emph{Lego Mindstorms} in campo didattico}
+I \emph{Lego Mindstorms} sono derivati, come accennato sopra, da un applicazione 
+di tipo didattico dell'\emph{MIT Media Lab}. Per questo la Lego ha deciso
+di continuare a seguire questa idea proponendo alle scuole dei set
+didattici chiamati \emph{Lego Mindstorms for Schools}. Questi set,
+conosciuti anche come ``Challenge set'', differiscono da quelli in
+commercio normalmente per un sensore di luce extra, alcuni ingranaggi in
+pi\'u ed un software per la programmazione dei brick differente.
+
+Questo software, chiamato ``ROBOLAB'', \'e basato sul software ``LabVIEW''
+della \emph{National Instruments}, un ambiente di sviluppo per il
+loro linguaggio di programmazione visivo per l'automatizzazione
+industriale. Un altra scleta per la programmazione dei bricks \'e
+l'utilizzo di firmware o linguaggi di programmazione di terze parti, tra i
+quali anche linguaggi conosciuti come il \emph{C} o il \emph{JAVA}, i quali
+vengono usati dai professionisti in campo di programmazione embedded.
+
+\subsubsection{L'origine del nome \emph{Mindstorms}}
+I \emph{Lego Mindstorms} devono il loro nome al titolo del libro
+``Mindstorms: Children, Computers, and Powerful Ideas'', scritto da \emph{Seymour
+Papert}, uno dei pionieri dell'Intelligenza Artificiale ed inventore del
+\emph{LOGO}. In questo libro Papert proponeva un ambiente di studio basato
+sui computer chiamato \emph{il Micromondo}.
+
+Questo Micromondo doveva completare il metodo di costruzione della
+conoscenza dei bambini, conosciuto come \emph{Approccio Costruttivista
+all'insegnamento ed al sapere}.
+
+Siccome i \emph{Lego Mindstorms} hanno alla base proprio questa idea
+perci\'o la \emph{Lego} ha deciso di utilizzare questo nome.
+
+\section{Lego MINDSTORMS - RCX}
+La prima versione dei \emph{Lego Mindstorms} aveva come base il brick
+conosciuto come \emph{RCX}.
+\graffito{Specifiche tecniche dell'RCX}Contiene un microcontroller 
+\emph{Renesas H8/300} come CPU ed una memoria RAM di 32KB. L'unica
+interfaccia di comunicazione con il PC o gli altri RCX \'e una porta
+\emph{InfraRed} (IR). Questo rende impossibile l'upload di programmi
+sull'RCX con metodi differenti da un'interfaccia proprietaria IR per la
+quale esistono drivers solo per Windows e MAC. \'E possibile caricare
+programmi anche in ambiente \emph{*NIX}, utilizzando per\'o metodi
+differenti, quali il compilatore per \emph{Not Quite C}.
+
+Oltre alla porta IR sono presenti tre porte per i sensori, tre per i
+motori ed un LCD sul quale si poteva leggere la carica della batteria, lo
+stato di motori e sensori, il programma in esecuzione oppure quale
+programma era in esecuzione al momento.
+
+I programmi, sull'RCX, vengono mantenuti sulla memoria RAM, quindi ogni
+volta che veniva spento il brick questi vengono cancellati ed vanno
+ricaricati sul brick. Questo problema, nella versione 1.0 degli RCX, \'e
+risolto grazie alla presenza di un jack per la connessione ad un
+caricatore.
+
 
 \cleardoublepage
