@@ -93,6 +93,7 @@ RS485.
 La piattaforma \emph{AT91SAM7S256} \'e basata su un processore
 \emph{ARM7}, utilizzato gi\'a in vari prodotti di grande distribuzione,
 quali:
+\graffito{L'uso del processore ARM7 sul mercato}
 \begin{itemize}
     \item Il \emph{Sega Dreamcast}
     \item L'\emph{Apple iPod}
@@ -108,6 +109,12 @@ anche grazie all'interfaccia di programmazione visiva. Questa interfaccia,
 per\'o risulta essere estremamente limitata appena bisogna sviluppare
 qualcosa di complesso, come un client per la comunicazione
 \emph{BlueTooth}.
+
+\subsubsection{Le altre interfaccie I/O disponibili per gli NXT}
+Un altro punto forte dei \nxt{} \'e la disponibilit\'a di una vasta gamma
+di sensori ``di serie'' inclusi all'interno delle scatole base, con i quali
+poter interagire con il mondo esterno, oltre a quelle fornite dalla
+piattaforma \emph{AT91SAM7S256} 
 
 \section{La piattaforma Software}
 Una volta deciso su quale piattaforma hardware operare la scelta successiva
@@ -213,7 +220,36 @@ una responsivit\'a maggiore.
 L'ultimo passo \'e stato quello di scrivere il client per l'interpretazione
 dei \emph{BROFists}, oltre che di controllo della velocit\'a dei motori.
 
-Il client \'e un applicazione formata da varie 
+\graffito{Struttura del BROFistClient}
+Il client \'e formato da quattro task, ognuno con il suo compito specifico:
+\begin{description}
+    \item[Comunicazioni Bluetooth e Decodifica dei BROFists]utilizzando
+        le definizioni per il protocollo condivise tra tutte le parti del
+        progetto. Questo \'e, fondamentalmente, il nucleo dell'intero
+        Client: recupera i dati richiesti dai vari sensori e setta le
+        potenze o le velocit\'a da raggiungere per i singoli Servo Motori.
+    \item[Calcolo delle velocit\'a istantanee dei motori]il quale legge
+        periodicamente i dati dei sensori Tachimetrici e li registra
+        all'interno delle strutture contenenti i dati dei singoli Servo
+        Motori.
+    \item[Controllo della velocit\'a dei motori]tramite l'utilizzo di un
+        \PID{}, il quale usa i dati relativi alle
+        potenze ed agli errori di velocit\'a per calcolare quanta potenza
+        utilizzare per far andare i motori alla velocit\'a richiesta.
+    \item[Rappresentazione di dati sullo schermo]utilizzando un comando
+        delle API di \nxtOSEK{}. Naturalmente questi dati possono venir
+        configurati modificando il codice sorgente del client.
+\end{description}
+Ogni task viene fatto girare in contemporanea, grazie alla struttura di
+\nxtOSEK{}, il quale permette l'esecuzione multitask realtime. 
+\graffito{La necessit\'a di un sistema Realtime}
+Questo significa inoltre che sappiamo a priori che i vari task avranno un tempo di
+esecuzione massimo ben specifico.
+Siccome i tempi di aggiornamento delle velocit\'a e gli intervalli di
+aggiornamento delle potenze da applicare ai motori devono essere sempre gli
+stessi \'e necessario che il sistema segua le specifiche che gli vengono
+fornite, ed \'e per questo che il sistema \nxtOSEK{} \'e stato scelto come
+base per il Client.
 
 \cleardoublepage
 
