@@ -1,4 +1,5 @@
 \chapter{Background}
+\label{chap:BG}
 
 In questo capitolo parleremo del background tecnico e culturale che sta
 dietro a questo progetto. Ci sar\'a spazio per una breve storia dei \nxt{}, 
@@ -26,11 +27,23 @@ nome di \emph{LEGOSheets}.
 \graffito{I vari contenuti dei kits dei \emph{Lego Mindstorms}}
 Non tutte le versioni dei \emph{Lego Mindstorms} hanno avuto le stesse
 dotazioni in campo di sensori e servo motori. La prima versione chiamata
-\RIS{}, conteneva due motori, due sensori di tocco ed un
-sensore di luce. La versione \emph{NXT} conteneva, invece, due \emph{Servo}
-Motori, un sensore di luce, uno di tocco, uno sonoro ed uno di distanza.
+\RIS{}, conteneva:
+\begin{itemize}
+    \item Due motori
+    \item Due sensori di tocco
+    \item Un sensore di luce
+\end{itemize}    
+La versione \emph{NXT} conteneva, invece:
+\begin{itemize}
+    \item Due \emph{Servo} Motori
+    \item Un sensore di luce
+    \item Un sensore di tocco
+    \item Un sensore sonoro
+    \item Un sensore di distanza ad ultrasuoni
+\end{itemize}
 L'ultima versione, infine, ha la stessa dotazione di quella precedente,
-solo con due sensori di tocco invece di uno soltanto. 
+solo con due sensori di tocco, invece di uno soltanto, ed un sensore di
+Colore al posto di quello di luce. 
 
 \graffito{L'uso dei \emph{Lego Mindstorms} in campo didattico}
 I \emph{Lego Mindstorms} sono derivati, come accennato sopra, da un applicazione 
@@ -51,22 +64,25 @@ vengono usati dai professionisti in campo di programmazione embedded.
 
 \subsubsection{L'origine del nome \emph{Mindstorms}}
 I \emph{Lego Mindstorms} devono il loro nome al titolo del libro
-``Mindstorms: Children, Computers, and Powerful Ideas'', scritto da \emph{Seymour
-Papert}, uno dei pionieri dell'Intelligenza Artificiale ed inventore del
-\emph{LOGO}. In questo libro Papert proponeva un ambiente di studio basato
-sui computer chiamato \emph{il Micromondo}.
+``Mindstorms: Children, Computers, and Powerful Ideas''\cite{bib:mindbook},
+scritto da \emph{Seymour Papert}, uno dei pionieri dell'Intelligenza
+Artificiale ed inventore del \emph{LOGO}. In questo libro Papert proponeva
+un ambiente di studio basato sui computer chiamato \emph{il Micromondo}.
 
 Questo Micromondo doveva completare il metodo di costruzione della
 conoscenza dei bambini, conosciuto come \emph{Approccio Costruttivista
 all'insegnamento ed al sapere}.
 
 Siccome i \emph{Lego Mindstorms} hanno alla base proprio questa idea
-perci\'o la \emph{Lego} ha deciso di utilizzare questo nome.
+perci\'o la \emph{Lego} ha deciso di utilizzare questo
+nome\cite{bib:mindbarticle}.
 
-\section{Lego MINDSTORMS - RCX}
+\subsection{Lego MINDSTORMS - RCX}
 La prima versione dei \emph{Lego Mindstorms} aveva come base il brick
 conosciuto come \emph{RCX}.
-\graffito{Specifiche tecniche dell'RCX}Contiene un microcontroller 
+
+\subsubsection{Specifiche tecniche dell'RCX}
+Gli RCX contengono un microcontroller 
 \emph{Renesas H8/300} come CPU ed una memoria RAM di 32KB. L'unica
 interfaccia di comunicazione con il PC o gli altri RCX \'e una porta
 \emph{InfraRed} (IR). Questo rende impossibile l'upload di programmi
@@ -75,16 +91,141 @@ quale esistono drivers solo per Windows e MAC. \'E possibile caricare
 programmi anche in ambiente \emph{*NIX}, utilizzando per\'o metodi
 differenti, quali il compilatore per \emph{Not Quite C}.
 
+La connessione IR permette, inoltre, la comunicazione con una serie di
+altri prodotti della \emph{Lego}, listati sotto. Le comunicazioni hanno una
+\emph{Carrier Frequency} di 38.5kHz nella verione 1.0 e di 75kHz nella
+versione 2.0, la quale viene generata dai timer interni dell'RCX.
+
 Oltre alla porta IR sono presenti tre porte per i sensori, tre per i
 motori ed un LCD sul quale si poteva leggere la carica della batteria, lo
 stato di motori e sensori, il programma in esecuzione oppure quale
 programma era in esecuzione al momento.
 
+Oltre a motori e sensori la Lego aveva messo in commercio anche una
+telecamera in collaborazione con la \emph{Logitech}. Questa, per\'o, non
+era collegata direttamente al brick RCX, bensì aveva bisogno di venir
+collegata ad un PC.
+
+\graffito{Alimentazione degli RCX}
 I programmi, sull'RCX, vengono mantenuti sulla memoria RAM, quindi ogni
 volta che veniva spento il brick questi vengono cancellati ed vanno
 ricaricati sul brick. Questo problema, nella versione 1.0 degli RCX, \'e
 risolto grazie alla presenza di un jack per la connessione ad un
-caricatore.
+caricatore. Nelle versioni successive, comunque, la connessione alla
+corrente elettrica \'e stata rimossa. Grazie alla presenza del jack per la
+connessione alla corrente i brick RCX sono diventati popolari tra gli
+appassionati di modellismo come centro di controllo per trenini della lego.
+
+\subsubsection{Linguaggi di programmazione per RCX}
+Ci sono vari linguaggi utilizzabili per la programmazione degli RCX, oltre
+a quelli ufficiali, \emph{RCX Code} e \emph{ROBOLAB}. Quelli pi\'u
+importanti sono:
+\begin{description}
+    \item[NXTGCC]una toolchain di compilazione per C ed Assembly che
+        permette la creazione di firmware da caricare su di un'unit\'a RCX
+    \item[leJOS]che permette l'utilizzo di Java
+    \item[Visual Basic]tramite l'utilizzo dell'interfaccia \emph{COM+}
+        fornita nel CD dei \RIS{}
+    \item[NXC]che \'e un linguaggio Open Source simile al C
+    \item[XSLisp]che \'e un implementazione di \emph{LISP} per RCX ed NXT
+\end{description}
+
+\subsection{Lego MINDSTORMS - NXT}
+Nel 2006 la Lego ha messo sul mercato la seconda versione dei \emph{Lego
+Mindstorms}: I \nxt{}.
+
+Questa nuova incarnazione deli \emph{Lego Mindstorms} era basata sulla
+stessa idea, solo che il brick fu radicalmente cambiato ad una versione
+pi\'u potente.
+
+\subsubsection{Specifiche tecniche dell'NXT}
+Il brick \'e un micro computer basato su un microcontrollore della
+\emph{ATMEL} che ha come processore un \emph{ARM7}, il quale, a temperature
+standard, ha un clock di circa 100MHz, mentre a temperature industriali,
+nel caso peggiore, arriva ad un clock di 55MHz. Inoltre ha una memoria
+flash di 256KB ed una memoria volatile di tipo SRAM da 64KB.
+
+\graffito{Comunicazioni tra device e con l'utente}
+Le comunicazioni con altri device (PC o NXT) vengono fornite da un
+controller \emph{USB 2.0 High Speed} e da uno \emph{Bluetooth}, inoltre una
+delle porte RJ12 per i sensori (la numero 4, per essere precisi) \'e una
+porta \emph{RS-485 Capable}.
+
+Le comunicazioni con l'utente avvengono attraverso l'uso di un display LCD
+di tipo \emph{Dot Matrix} della dimensione di 100x64 pixel. \'E anche
+disponibile uno speaker monoaurale che pu\'o riprodurre dei file audio con
+un sampling rate di 8kHz.
+
+\graffito{Differenze tra gli NXT e gli NXT2.0}
+Nella versione attuale gli \nxt{} non hanno differenze nel brick. L'unica
+differenza \'e la presenza di un sensore di colore al posto di quello di
+luce.
+
+\graffito{Alimentazione degli NXT}
+Come le versioni 1.5 e 2.0 degli RCX anche gli NXT non hanno una presa per
+l'alimentazione esterna. L'alimentazione viene fornita da sei batterie
+stilo di tipo AA, permettendo quindi l'uso di batterie ricaricabili. Nelle
+versioni didattiche venivano per\'o fornite delle batterie ricaricabili a
+ioni di Litio ed un alimentatore. Queste batterie sono acquistabili anche
+dal negozio online della \emph{Lego}.
+
+\subsubsection{Linguaggi di programmazione per gli NXT}
+Due sono i metodi per programmare un brick NXT che vengono forniti
+gratuitamente dalla Lego sia nei kit ``retail'' che in quelli
+``didattici'':
+\begin{itemize}
+    \item Creare dei semplici programmi direttamente sul men\'u
+        dell'NXT, i quali per\'o, sono limitati a 5 comandi.
+    \item Creare dei programmi utilizzando il sistema fornito dalla Lego
+        chiamato NXT-G. Questo software di programmazione visiva \'e
+        derivato da \emph{LabView} della \emph{National Instruments} e
+        fornisce della programmazione di box di controllo.
+
+        Non permette una programmazione avanzata, cosa che invece fornisce
+        un Toolkit a pagamento fatto apposta dalla \emph{National
+        Instruments} per \emph{Labview}
+\end{itemize}
+
+Questi metodi, per\'o, non forniscono dei veri linguaggi di programmazione,
+bens\'i dei sistemi di programmazione visuale che non permettono la
+creazione di programmi complessi quanto quelli che ci si aspetterebbe da
+una piattaforma di tipo embedded.
+
+Per questo sono presenti un gran numero di alternative, create
+appositamente per utilizzare i linguaggi usati in campo professionale,
+oppure per sembrare tali:
+\begin{description}
+    \item[nxtOSEK]\'e un ambiente basato su standard \emph{OSEK} che
+        permette la programmazione in C/C++ su brick NXT. Questo \'e il
+        sistema che \'e stato scelto per questo progetto grazie alla
+        flessibilit\'a ed alla vicinanza con il mondo dello sviluppo di
+        sistemi embedded.
+    \item[NBC, NXC e BricxCC]formano un ambiente di sviluppo ``Open
+        Source''. Il termine \'e stato messo tra virgolette in quanto sia
+        NBC che NXC, i due linguaggi derivati, il primo da Assembly ed il
+        secondo da C, vengono distribuiti Open Source, mentre l'ambiente di
+        sviluppo, BricxCC, viene distribuito come Freeware.
+
+        Quest'ultimo fornisce vari strumenti quali:
+        \begin{itemize}
+            \item[-]NeXTExplorer, per la gestione di files sulla memoria
+                dell'NXT o per la sua deframmentazione
+            \item[-]Un HEX editor
+            \item[-]NeXTScreen, un visualizzatore di ci\'o che viene
+                mostrato sullo schermo dell'NXT
+        \end{itemize}
+    \item[leJOS NXJ]\cite{bib:lejos}\'e un linguaggio di alto livello basato su Java che
+        usa un firmware custom sviluppato dal teamleJOS
+    \item[ROBOTC]\cite{bib:robotc}\'e un linguaggio basato su C con un ambiente di sviluppo
+        per Windows ed \'e l'unico che fornisce un debugger in real-time.
+        Il problema \'e che questo sistema non solo richiede l'uso di
+        Windows in quanto non \'e compilabile al di fuori della propria
+        IDE, ma \'e anche a pagamento.
+
+        \'E comunque stato citato come il miglor sistema per insegnare il C
+        attraverso la programmazione di NXT\cite{bib:rcarticle}.
+\end{description}
+
 
 
 \cleardoublepage

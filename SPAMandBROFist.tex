@@ -9,13 +9,24 @@
 \usepackage[italian]{babel}
 \usepackage{graphicx}
 \usepackage{indentfirst}
-\lstset{language=C,
-        showspaces=false,
-        showtabs=false,
-        showstringspaces=false,
-        basicstyle=\footnotesize,
-        numberstyle=\footnotesize,
-        frame=single}
+
+\usepackage{color}
+\definecolor{Brown}{cmyk}{0,0.81,1,0.60}
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.70,0.57,0.23,0}
+
+\usepackage{listings}
+\lstset{language=[ansi]C,
+        frame=tRBl, %
+        frameround=ftff, %
+        basicstyle=\footnotesize, %
+        keywordstyle=\ttfamily\color{OliveGreen}, %
+        identifierstyle=\ttfamily\color{CadetBlue}\bfseries, %
+        commentstyle=\slshape\ttfamily\color{Brown}, %
+        stringstyle=\ttfamily, %
+        showstringspaces=true, %
+        captionpos=b
+}
 \input{VariousStuff/defines}
 \usepackage{}
 \author{Michele "Jazzinghen" Bianchi}
@@ -23,7 +34,14 @@
 \begin{document}
     \tableofcontents
     \cleardoublepage
+    
     \input{Chapters/ThanksStuff}
+    
     \input{Chapters/Intro}
+    
     \input{Chapters/Background}
+
+    \addcontentsline{toc}{chapter}{\bibname}
+    
+    \input{VariousStuff/bibliography}
 \end{document}

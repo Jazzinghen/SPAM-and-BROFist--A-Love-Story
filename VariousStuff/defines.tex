@@ -3,6 +3,31 @@
     \begin{lstlisting}}         %
     {\end{lstlisting}}
 
+% args: image path
+%       caption
+%       width
+%       label
+\newcommand{\image}[4]{%
+    \begin{figure}[hbt]%
+    \centering%
+    \includegraphics[width=#3\columnwidth]{#1}%
+    \caption{\emph{#2}}%
+    \label{#4}%
+    \end{figure}%
+}
+
+% args: image path
+%       caption
+%       label
+\newcommand{\imageFullWidth}[3]{\image{#1}{#2}{0.8}{#3}}
+
+\newcommand{\picref}[1]{figura \ref{#1}}
+
+\newcommand{\website}[2]{Sito web di \techname{#1}: \\ \url{#2}}
+\newcommand{\paper}[3]{#1: \emph{#2} \\ \url{#3}}
+
+\newcommand{\techname}[1]{{\sc #1}}
+
 \newcommand{\nxt}{\emph{Lego MINDSTORMS NXT}}
 \newcommand{\nxtOSEK}{\emph{nxtOSEK}}
 \newcommand{\BROFist}{\emph{BROFist}}

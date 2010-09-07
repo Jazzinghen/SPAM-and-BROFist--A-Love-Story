@@ -1,4 +1,6 @@
 \chapter{Introduzione}
+\label{chap:Intro}
+
 \section{I sistemi Embedded}
 \graffito{I sistemi Embedded nella vita di tutti i giorni}
 Negli ultimi tempi le vere rivoluzioni tecnologiche si sono sempre
@@ -122,9 +124,9 @@ era quella di quale sistema software montare su di essa per avere il
 controllo corretto dei sensori e dei servo motori. Le scelte vagliate sono
 state fondamentalmente tre:
 \begin{description}
-    \item[nxOS]un sistema operativo per \nxt{} scritto da David Anderson,
+    \item[nxOS]\cite{bib:nxos}un sistema operativo per \nxt{} scritto da David Anderson,
     il quale, per\'o non sta pi\'u venendo aggiornato da maggio del 2009
-    \item[NBC \& NXC]due ``dialetti'' derivati, il primo,
+    \item[NBC \& NXC]\cite{bib:nbcnxc}due ``dialetti'' derivati, il primo,
     dall'\emph{Assembly} e, il secondo, dal \emph{C}.
     \item[nxtOSEK]un sistema operativo basato su specifiche \emph{OSEK}
     sviluppato da Takashi Chikamasa.
@@ -133,18 +135,18 @@ Dopo una lunga ricerca e svariati test effettuati su queste piattaforme
 Software la scelta \'e ricaduta sul sistema \emph{nxtOSEK}.
 
 \subsection{nxtOSEK}
-\nxtOSEK{} \'e una piattaforma open source per i \nxt{} formata da tre
+\nxtOSEK{}\cite{bib:nxtosek} \'e una piattaforma open source per i \nxt{} formata da tre
 parti:
 \begin{description}
     \item[Device Drivers]in C/Assembly di \emph{leJOS NXJ}, un firmware di
         rimpiazzo per i \nxt{} basato su \emph{Java}
     \item[TOPPERS/ATK]conosciuto come \emph{TOPPERS/OSEK}, visto che
-        segue le specifiche \emph{OSEK}, uno standard per sistemi
+        segue le specifiche \emph{OSEK}\cite{bib:osek}, uno standard per sistemi
         operativi, stack di comunicazione e protocolli di rete per sistemi
         embedded. Questo fornisce un ambiente real-time multitaking che
         segue queste specifiche.
     \item[TOPPERS/JSP]fornisce un ambiente real-time multitasking basato
-        sulle specifiche giapponesi \emph{$\mu$ITRON}.
+        sulle specifiche giapponesi \emph{$\mu$ITRON}\cite{bib:muitron}.
 \end{description}
 Grazie all'unione di queste features e all'utilizzo di una toolchain GCC
 per ARM \emph{nxtOSEK} fornisce un ambiente di sviluppo Real Time in Ansi C
