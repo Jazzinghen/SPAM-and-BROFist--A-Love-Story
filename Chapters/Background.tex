@@ -3,7 +3,7 @@
 
 In questo capitolo parleremo del background tecnico e culturale che sta
 dietro a questo progetto. Ci sar\'a spazio per una breve storia dei \nxt{}, 
-delle veloci nozioni riguardanti al \PID{} e del \emph{Bluetooth}.
+delle veloci nozioni riguardanti il \PID{} ed \nxtOSEK{}.
 
 \section{I MINDSTORMS e gli NXT}
 I \nxt{} sono l'ultima incarnazione di una serie di prodotti creati
@@ -57,7 +57,7 @@ pi\'u ed un software per la programmazione dei brick differente.
 Questo software, chiamato ``ROBOLAB'', \'e basato sul software ``LabVIEW''
 della \emph{National Instruments}, un ambiente di sviluppo per il
 loro linguaggio di programmazione visivo per l'automatizzazione
-industriale. Un altra scleta per la programmazione dei bricks \'e
+industriale. Un altra scelta per la programmazione dei bricks \'e
 l'utilizzo di firmware o linguaggi di programmazione di terze parti, tra i
 quali anche linguaggi conosciuti come il \emph{C} o il \emph{JAVA}, i quali
 vengono usati dai professionisti in campo di programmazione embedded.
@@ -103,7 +103,7 @@ programma era in esecuzione al momento.
 
 Oltre a motori e sensori la Lego aveva messo in commercio anche una
 telecamera in collaborazione con la \emph{Logitech}. Questa, per\'o, non
-era collegata direttamente al brick RCX, bensì aveva bisogno di venir
+era collegata direttamente al brick RCX, bens\'i aveva bisogno di venir
 collegata ad un PC.
 
 \graffito{Alimentazione degli RCX}
@@ -214,10 +214,11 @@ oppure per sembrare tali:
             \item[-]NeXTScreen, un visualizzatore di ci\'o che viene
                 mostrato sullo schermo dell'NXT
         \end{itemize}
-    \item[leJOS NXJ]\cite{bib:lejos}\'e un linguaggio di alto livello basato su Java che
-        usa un firmware custom sviluppato dal teamleJOS
-    \item[ROBOTC]\cite{bib:robotc}\'e un linguaggio basato su C con un ambiente di sviluppo
-        per Windows ed \'e l'unico che fornisce un debugger in real-time.
+    \item[leJOS NXJ]\cite{bib:lejos}\'e un linguaggio di alto livello
+        basato su Java che usa un firmware custom sviluppato dal team leJOS
+    \item[ROBOTC]\cite{bib:robotc}\'e un linguaggio basato su C con un
+        ambiente di sviluppo per Windows ed \'e l'unico che fornisce un
+        debugger in real-time.
         Il problema \'e che questo sistema non solo richiede l'uso di
         Windows in quanto non \'e compilabile al di fuori della propria
         IDE, ma \'e anche a pagamento.
@@ -226,6 +227,296 @@ oppure per sembrare tali:
         attraverso la programmazione di NXT\cite{bib:rcarticle}.
 \end{description}
 
+\section{nxtOSEK}
+\image  {Images/nxtOSEKStruct}
+        {La struttura del sistema \nxtOSEK{}}
+        {.8}
+        {img:nxtosekstr}
+Per questo progetto, tra le scelte disponibili, \'e stato scelto di usare
+la piattaforma Open Source \nxtOSEK{}. Questa scelta \'e stata influenzata
+da vari fattori, tra i quali:
+\graffito{Le scelte che hanno portato all'utilizzo di \nxtOSEK{}}
+\begin{itemize}
+    \item I programmi per questa piattaforma possono venir scritti sia in C
+        che in C++.
 
+        Questo \'e molto differente rispetto alle altre alternative in
+        quanto nella maggior parte dei progetti embedded vengono utilizzati
+        uno di questi linguaggi di basso livello assieme ad
+        \techname{assembly}.
+
+        Questo grazie ad una toolchain GCC per la compilazione di file
+        \techname{.rxe}, cosa, tra l'altro, che rende il progetto
+        completamente cross-plataform\footnote{Si faccia riferimento al
+        paragrafo \ref{sec:nxtoseklinux} per vedere quali accorgimenti
+        sono stati presi per utilizzare \nxtOSEK{} sotto Linux.}, sebbene
+        non proprio ``out of the box''.
+    \item \nxtOSEK{} è basato sui sistemi realtime multitask
+        \techname{TOPPERS/OSEK[ATK]} e \techname{TOPPERS/JSP}, i quali
+        seguono, rispettivamente, le specifiche \techname{OSEK/VDX} e
+        \techname{$\mu$ITRON 4.0}.
+
+        Questo fornisce, a differenza degli altri sistemi, una piattaforma
+        ancora più vicina all'industria di sistemi Embedded, in quanto
+        \techname{OSEK/VDX} viene utilizzato nella produzione di sistemi di
+        controllo per automobili, mentre \techname{$\mu$ITRON 4.0}
+        rappresenta uno standard aperto industriale giapponese nel campo dei
+        sistemi embedded.
+    \item I device drivers sono stati ricavati dal progetto \techname{NXJ}
+        del team \emph{leJOS}, i quali sono più affidabili di quelli
+        proposti in un altro progetto scritto in C: \techname{nxOS}.
+
+        Sfruttando un \PID{} c'era la necessità di aver pieno controllo sui
+        motori, facendoli ruotare a velocità anche molto basse. Purtroppo
+        i device drivers di \techname{nxOS} non permettevano la rotazione
+        con una potenza in input al di sotto del 50\%.
+
+        Inoltre \nxtOSEK{} permette l'utilizzo di un gran numero di sensori
+        di terze parti che potrebbero rivelarsi utili a chiunque ne abbia
+        accesso.
+\end{itemize}
+
+\subsection{Struttura di un programma per nxtOSEK}
+La scrittura di un programma per \nxtOSEK{} è quasi completamente identico
+alla scrittura di un programma in C, bisogna scrivere un file che sarà
+quello principale, al quale possono venir inclusi vari headers, puntanti ad
+altri file sorgente contenenti le varie funzioni utilizzate nel codice.
+
+\graffito{Task OSEK}
+Quello che differisce dal C è la necessità di dichiarare i \techname{Task}
+che verranno eseguiti con un tempo periodico da \nxtOSEK{}. Questi devono
+venir definiti all'interno di un file, che verrà poi dichiarato all'interno
+del \cypher{Makefile}, utilizzando le specifiche dell'\emph{OSEK
+Implementation Language}\cite{bib:OIL}.
+
+Il file si presenta con una struttura simile a quella riportata nell
+riquadro \ref{lst:sampleoil}, alla quale bisogna aggiungere i vari task.
+
+Ognuno di questi Task ha le proprie caratteristiche ben definite, tra le
+quali la priorità d'esecuzione (\cypher{PRIORITY}), la dimensione dello
+stack allocato per quel Task (\cypher{STACKSIZE}) oppure ancora se il Task
+debba partire automaticamente o meno (\cypher{AUTOSTART}).
+
+\begin{figure*}[htbp]
+    \begin{lstlisting}[caption=Sample \emph{OIL} file,
+                       label=lst:sampleoil]
+#include "implementation.oil"
+
+CPU ATMEL_AT91SAM7S256
+{
+    OS LEJOS_OSEK
+    {
+        STATUS = EXTENDED;
+        STARTUPHOOK = TRUE;
+        ERRORHOOK = FALSE;
+        SHUTDOWNHOOK = FALSE;
+        PRETASKHOOK = TRUE;
+        POSTTASKHOOK = FALSE;
+        USEGETSERVICEID = FALSE;
+        USEPARAMETERACCESS = FALSE;
+        USERESSCHEDULER = FALSE;
+    };
+
+    APPMODE appmode1{}; 
+
+    RESOURCE lcd
+    {
+        RESOURCEPROPERTY = STANDARD;
+    };
+
+  	COUNTER SysTimerCnt
+  	{
+    	MINCYCLE = 1;
+    	MAXALLOWEDVALUE = 10000;
+    	TICKSPERBASE = 1;
+  	};
+
+//... Tasks Declarations
+
+//... Tasks' Alarms
+
+}
+    \end{lstlisting}
+\end{figure*}
+Ognuno di questi task, inoltre, può venir collegato ad un allarme periodico
+che può venir utilizzato per settare un evento, richiamare una callback
+oppure, come già accennato, attivare un Task.
+
+Un esempio di come sia collegato un Task ad un allarme periodico è
+riportato nel riquadro \ref{lst:oiltskalarm}
+\begin{figure*}[htbp]
+    \begin{lstlisting}[caption=Sample Task-Alarm declaration,
+                       label=lst:oiltskalarm]
+TASK PID_Controller
+{
+    AUTOSTART = FALSE;
+    PRIORITY = 3;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+};
+
+//  ... Other Tasks
+
+ALARM PID_alarm
+{
+    COUNTER = SysTimerCnt;
+    ACTION = ACTIVATETASK
+    {
+        TASK = PID_Controller;
+    };
+    AUTOSTART = TRUE
+    {
+        ALARMTIME = 1;
+        CYCLETIME = 5;  // 5ms run time
+        APPMODE = appmode1;
+    };
+};
+    \end{lstlisting}
+\end{figure*}
+
+\graffito{Utilizzo dei Task dentro il codice C}
+Una volta dichiarati i Task utilizzando il linguaggio d'Implementazione
+\emph{OSEK} bisogna collegare le parti del nostro programma a queste
+dichiarazioni.
+
+Ad ogni task bisogna ricollegare una parte di programma che verrà eseguita
+proprio come una funzione senza parametri, in quanto il richiamo di un
+Task, in codice C, viene scritto come: \codeconst{TASK(TaskName)\{\};}.
+Inoltre bisogna informare l'intero programma della presenza delle varie
+\emph{risorse} disponibili, tra le quali task, allarmi e risorse. Questo
+viene fatto prima della dichiarazione di un qualsiasi Task utilizzando la
+forma \codeconst{DeclareTask(TaskName);}.
+
+Questo porta ad un problema principale, ovvero la mancanza di passaggio
+d'informazioni di contesto. Per risolvere questo problema bisogna
+utilizzare, per quanto rischioso, delle variabili globali.
+
+Meritano di venir menzionate, inoltre, tre funzioni che fanno parte delle
+API di \nxtOSEK, quella di inizializzazione (\codeconst{void
+ecrobot\_device\_initialize()\{\}}), quella di finalizzazione
+(\codeconst{void ecrobot\_device\_terminate()\{\}}) e quella che va
+chiamata da un interrupt di tipo 2 dall'\emph{ISR} (\codeconst{void
+user\_1ms\_isr\_type2(void)\{\}}).
+
+Un programma, dunque, avrà una forma tipo quella mostrata nel riquadro
+\ref{lst:sampnxtc}.
+
+\begin{figure*}[htbp]
+    \begin{lstlisting}[caption=Sample \nxtOSEK{} C structure,
+                       label=lst:sampnxtc]
+// Includes
+
+/*-----------------------------------------------------*/
+/* OSEK declarations                                   */
+/*-----------------------------------------------------*/
+DeclareCounter(SysTimerCnt);
+DeclareResource(lcd);
+DeclareTask(BRO_Comm);
+DeclareTask(PID_Controller);
+DeclareTask(Speed_Updater);
+DeclareTask(DisplayTask);
+
+void ecrobot_device_initialize()
+{
+//  ...
+}
+
+void ecrobot_device_terminate()
+{
+//  ...
+}
+
+void user_1ms_isr_type2(void)
+{
+//  ... Type 2 Interrupt Function (Normally in here we stop
+//  ... nxtOSEK when the "left button" is pressed on the NXT
+//  ... Brick
+}
+
+TASK(PID_Controller)
+{
+//  ...
+}
+
+//  All the other Tasks
+    \end{lstlisting}
+\end{figure*}
+
+\subsection{Compilazione delle applicazioni per nxtOSEK}
+Ogni volta che viene compilato un programma per nxtOSEK avvengono i
+seguenti passi:
+\begin{enumerate}
+    \item Vengono compilate le prime parti del sistema \nxtOSEK{}, tra cui
+        i sistemi di controllo di allarmi, interrupt ed eventi
+    \item Viene creato un file di configurazione per il Kernel di
+        \nxtOSEK{} da un parser per file \techname{.oil}, chiamato
+        \emph{sg.exe}, il quale interpreta il file di configurazione
+        contenente le dichiarazioni delle risorse per il nostro programma.
+    \item Viene quindi compilato il resto di \nxtOSEK{} che richiedeva le
+        dichiarazioni dei Task, assieme al programma
+    \item Vengono assemblati i file \techname{.s} richiesti dal sistema,
+        quali il supporto per vettori, l'\emph{IRQ} ed il sistema di
+        gestione degli \emph{Entry Points}
+    \item Infine vengono generate le immagini binarie che verranno poi
+        caricate sul Brick NXT.
+\end{enumerate}
+
+\subsection{nxtOSEK in ambiente Linux} \label{sec:nxtoseklinux}
+Purtroppo, come scritto sulla pagina delle FAQs del progetto
+\nxtOSEK{}\cite{bib:nxtOSEKFAQs}, non esiste una procedura comoda per
+compilare e caricare su NXT i programmi scritti per \nxtOSEK{}.
+
+Seguendo la guida presente nel sito\cite{bib:linuxinst}, comunque, è
+possibile fare in modo che la compilazione funzioni anche attraverso l'uso
+di \techname{Wine}, in quanto il file per il parsing dei file
+\techname{OIL} è un eseguibile per Windows del quale non sono state
+rilasciate le specifiche.
+
+Inoltre, per la compilazione, sarà necessario settare correttamente tutti i
+path all'interno del file \cypher{ecrobot.mak}, in quanto gli strumenti
+usati sono vari e non è stato predisposto un metodo per l'utilizzio di
+variabili d'ambiente.
+
+\graffito{Upload di immagini su un unità NXT}
+Per l'upload delle immagini sull'unità \emph{NXT} si fa necessario
+l'utilizzo di \techname{NeXTTool}. Per compilare e far girare questa
+applicazione sotto Linux bisogna anche scaricare il compilatore per
+\emph{Turbo Pascal}.
+
+\section{PID Digital Controller}
+Il \PID{} è un sistema di controllo ciclico per i motori largamente
+utilizzato in applicazioni Industriali.
+
+\image  {Images/PID}
+        {Schematizzazione della struttura del Digital PID Controller}
+        {.8}
+        {img:PID}
+
+\'E un sistema che fa uso dei dati ricevuti dai motori per regolarne la
+potenza ad intervalli regolari e farli andare alla velocità desiderata. Lo
+schema generico è rappresentato nell'immagine \ref{img:PID}. Il nome
+\emph{PID} deriva dall'utilizzo dei dati in maniera sia in maniera
+Proporzionale che in maniera Integrativa e Derivativa.
+
+La parte Proporzionale determina la reazione del sistema all'errore
+istantaneo, quella Integrativa determina la reazione del sistema rispetto
+alla somma degli errori negli stati precedenti, mentre quella Derivativa
+ne determina la reazione in base a quanto velocemente l'errore cambia.
+
+I dati utilizzati da questo tipo di controller sono:
+\begin{itemize}
+    \item Le potenze applicate negli ultimi tre intervalli di tempo nei
+        quali è stato utilizzato il \emph{PID}
+    \item I $\Delta$V rispetto alla velocità target impostata negli ultimi
+        tre intervalli di tempo.
+    \item Una serie di costanti numeriche scelte \emph{ad hoc} in base alle
+        specifiche Hardware della piattaforma sulla quale andrà
+        implementato il \PID{}
+\end{itemize}
+
+Questo sistema, in base alle costanti numeriche, richiede un certo tempo
+per raggiungere la velocità richiesta e quindi stabilizzarsi su di essa,
+ottenendo così l'effetto desiderato.
 
 \cleardoublepage
