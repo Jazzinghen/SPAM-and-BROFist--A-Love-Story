@@ -1,0 +1,306 @@
+\chapter{Il Client per SPAM di BROFist}
+\label{chap:SPAMC}
+
+In questo capitolo parleremo dello svilupppo del client per \SPAM{} del
+progetto \BROFist{}, dei problemi riscontrati e delle funzionalità che
+possono venir riutilizzate in altri progetti.
+
+\section{Creazione di SPAM}
+Il robot sul quale è stato creato l'intero progetto non è sempre stato
+nella forma attuale. All'inizio il modello utilizzato era quello proposto
+dalla \emph{Lego} nelle istruzioni base contenute nelle scatole dei
+\nxt{} (Si faccia riferimento all'immagine\ref{img:orignxt}).
+\image  {Pictures/StandardNXT}
+        {Una delle versioni base di un \nxt{}, costruita seguendo le
+        istruzioni contenute nei kit forniti dalla lego}
+        {.5}
+        {img:orignxt}
+
+\graffito{Il problema di usare il modello presentato dalla \emph{Lego}} 
+Dopo poco, però, anche grazie all'aiuto di Ivan Simonini, si è capito che
+quella struttura aumentava gli errori di rotazione dei motori a causa di come era
+stato pensato.
+
+I motori erano montati in maniera tale che tutto il peso dell'unità
+gravasse a metà tra i due, dove non era presente nessun punto di scarico
+delle forze. Questo portava ad un'inclinazione verso il centro delle ruote,
+facendo sì che non si muovessero in linea retta, richiedendo l'uso di un
+feedback controller.
+
+Viste le premesse è stato richiesto ad Ivan Simonini, che al tempo lavorava
+come esperto presso il museo di scienze naturali di Trento, di controllare
+l'unità e di renderla più strutturalmente stabile.
+
+Il processo ha richiesto un mese e due prototipi, anche a causa della
+scarsità di parti presenti nelle scatole \emph{Educational} dei \nxt{} e
+delle richieste iniziali per il progetto, ovvero avere la possibilità di
+montare un sensore di distanza brandeggiabile parallelo al terreno ed un
+sensore di luce puntato verso il terreno a circa un centimetro da esso.
+\graffito{La necessità di avere il sensore parallelo al terreno}
+Il sensoore di distanza doveva venir necessariamente montato in maniera
+parallela rispetto al terreno in quanto il sistema di rilevamento della
+distanza funziona con l'utilizzo di ultrasuoni. Questi vengono emessi dal
+sensore il quale, misurando dopo quanto tempo ritorna l'onda, calcola la
+distanza dall'ostacolo puntato (Fare riferimento all'immagine
+\ref{img:sonarpr}).
+\image  {Images/SonarPrinciple}
+        {Teoria base del Sonar Attivo, utilizzata dai sensore di distanza
+        ad ultrasuoni per \nxt{}}
+        {1}
+        {img:sonarpr}
+
+Questo sitema, però, è influenzato dall'angolazione della superficie
+rispetto all'origine dell'onda, in quanto, se questa non è perpendicolare o
+di pochi gradi differente rispetto all'angolo retto, l'onda viene
+rimbalzata in una direzione differente da quella d'origine. Questo fa in
+modo che non torni al sensore, il quale pensa di non aver alcun ostacolo di
+fronte a se, oppure di averlo più lontano di quanto non lo sia realmente.
+
+Proprio a causa di questo problema si fa necessario il montaggio dei
+sensori in posizione parallela rispetto al terreno per eliminare almeno un
+fattore di errore per la lettura della distanza.
+
+Alla fine del processo di sviluppo e creazione, comunque, è stata costruita
+l'unità \SPAM{} (Foto \ref{img:spam}), la quale ha un sensore di distanza
+brandeggiabile parallelo al terreno, un sensore di luce e l'accesso diretto
+al brick \emph{NXT}.
+
+\section{Struttura e funzionamento del Client}\label{sec:clientstru}
+Come già detto in precedenza (sezione \ref{sec:BROClient}) il client
+\BROFist{} gira su un sistema \nxtOSEK{}, il quale fornisce tutte le
+funzionalità real time necessarie all'esecuzione con deadlines richieste da
+questo tipo di progetto. Il client è formato da quattro Task, i quali
+collaborano per il controllo dello \SPAM e per la comunicazione con il PC.
+
+Per ricapitolare i quattro Task hanno le seguenti mansioni:
+\begin{itemize}
+    \item Comunicazioni Bluetooth ed interpretazione dei
+        BROFists (\ref{sec:BROCommS})
+    \item Calcolo delle velocità istantanee dei motori (\ref{sec:BROSpdS})
+    \item Calcolo ed attuazione delle potenze dei singoli
+        motori (\ref{sec:BROPIDS})
+    \item Output di dati sul Display LCD (\ref{sec:BROLCDS})
+\end{itemize}
+
+Vediamo rapidamente in dettaglio ogni Task, con alcuni dati tecnici, per
+avere un'idea più chiara di quello che fanno:
+
+\subsection[Task ``BRO\_Comm'']{Task ``BRO\_Comm'': Comunicazioni BT ed
+interpretazione dei BROFists}\label{sec:BROCommS} 
+Questo task è, fondamentalmente, il cuore di tutto il client. \'E
+incaricato di comunicare via BlueTooth con il server, ricevere i dati,
+interpretarli, far fare allo \SPAM{} ciò che è stato richiesto e quindi
+mandare un'eventuale risposta al server.
+
+Per fare questo è stato necessario un lungo periodo di ricerche e test per
+comprendere come funzionino le API per la gestione delle comunicazioni
+BlueTooth ed avere ben in mente come fosse strutturato il protocollo di
+comunicazione \BROFist{}, cose delle quali parleremo nelle sezioni
+\ref{sec:BROTooth} e \ref{sec:theProtocol}.
+
+Dopo aver superato gli ostacoli imposti dai device drivers (e dal
+controller BlueTooth in se) lo svilupppo ha portato alla scrittura di un
+Task con un'esecuzione ciclica ogni \cypher{2ms}, il quale recupera sette
+\emph{BROFists} contemporaneamente quando sono presenti all'interno del
+buffer del controller BlueTooth e quindi li interpreta.
+
+\graffito{Perchè sette \emph{BROFists}}
+La scelta di inviare sette \emph{BROFists} alla volta è data dal fatto che
+sono presenti solo sette porte per la connessione di motori o sensori,
+quindi l'idea è quella che le richieste non dovrebbero essere superiori a
+quel numero. \'E anche vero che le persone potrebbero richiedere due dati
+differenti dallo stesso Servo Motore, però si è considerato che un
+programmatore possa derivare uno dei due valori avendo il primo.
+
+\graffito{L'uso dei dati ricevuti}
+Quando le richieste riguardano l'invio del dato letto da un sensore non ci
+sono problemi nella gestione dei dati: i dati vengono letti dai sensori e
+quindi vengono inseriti all'interno della struttura che andrà inviata al
+server presente sul PC. Se viene inviato un valore di potenza o velocità
+per i motori, invece, viene o chiamata la funzione per il calcolo della
+potenza in base alla velocità oppure settato il primo valore all'interno
+dell'array contenenti le potenze dei motori\footnote{Si faccia riferimento
+alla sezione \ref{sec:BROStruct} per avere più informazioni riguardo alla
+conformazione della struttura dei dati per il controllo dei motori}.
+
+\graffito{I dati in uscita}
+Una volta interpretati tutti i \emph{BROFists} il client forma una serie di
+\emph{BROFists} di risposta, i quali contengono la richiesta ed il dato ad
+essa correlato. Nel caso di potenza o velocità dei motori il dato è sempre
+0.
+
+\subsection[Task ``Speed\_Updater'']{Task ``Speed\_Updater'': Calcolo delle
+velocità istantanee}\label{sec:BROSpdS}
+La possibilità, da parte del server, di richiedere la velocità media di uno
+dei servo motori e la presenza di un \PID{} ha reso necessaria l'aggiunta
+di un Task per il monitoraggio e per l'aggiornamento dei dati riguardanti i
+vari Servo Motori installati.
+
+Il concetto di questo Task è molto semplice: ogni \cypher{5ms} viene letto i valori
+dei Tachiometri presenti all'interno di ogni motore e vengono registrati
+all'interno di un array circolare. Usando il valore precedente viene
+calcolata la velocità istantanea di ogni valore e viene inserita
+all'interno di un secondo array circolare.
+
+Facendo ciò, dunque, avremo abbastanza dati per poter calcolare la velocità
+media su \cypher{(5 * Dimensione dell'array circolare)ms}.
+
+\subsubsection{Problemi derivanti dall'uso dei valori dei Tachiometri}
+Il valore di ogni Tachiometro viene registrata all'interno di una variabile
+di tipo \codeconst{int32_t}. Questo \emph{potrebbe} portare a dei problemi
+dati dall'\emph{Overflow} o dall'\emph{Underflow} dato dall'eccessivo
+utilizzo dei motori.
+
+Questo, però, occorrerebbe soltanto dopo una rotazione continua, in una o
+in un'altra direzione, di \cypher{$2^{31}$}°, ovvero
+\cypher{2,147,483,648}°. Considerando il diametro delle ruote installate
+sullo \SPAM{}, che sono quelle contenute nei Kit \techname{Educational} dei
+\nxt{}, che misura \cypher{56mm} ed il fatto che esse sono collegate ai
+Servo Motori tramite degli ingranaggi con un rapporto \cypher{1:1}, la
+distanza che andrebbe percorsa da un singolo motore dovrebbe essere: $56mm
+* 3.14 * (2,147,483,648 / 360)$, ovvero una distanza pari a $1,048,927m$.
+
+\graffito{Un problema che non è un problema}
+Questa distanza è fin troppo grande per venir considerata un problema,
+visto che la carica della batteria e la velocità dei motori non
+permetterebbero il raggiungimento di una cifra così grande.
+
+\'E facile, comunque, che una frase simile si sia già sentita in passato nella
+storia dell'informatica, portando a problemi e bug, ma la correzione di un
+problema simile è facile e necessario solo in progetti che prevedono
+l'utilizzo dei motori per una durata così lunga, perciò è stata lasciata in
+dietro quasi volontariamente.
+
+\subsubsection{Utilizzo di un array circolare per il calcolo della velocità}
+Purtroppo la sensibilità dei Tachiometri integrati nei servo motori dei
+\nxt{} è limitata ai gradi interi. Questo porta ad una propagazione
+dell'errore di lettura quando si deve calcolare la velocità in
+\cypher{Gradi al Secondo}, in quanto bisogna moltiplicare il valore
+ricavato per una scala pari a \cypher{100 / Tempo di Sampling}.
+
+A causa di questo, infatti, la sensibilità della velocità diventa, appunto,
+pari alla scala che va applicata alla velocità per ogni intervallo di
+Sampling.
+
+Siccome una sensibilità tale non è utile, in quanto è inusabile dai vari
+algoritmi di controllo\footnote{Anche perchè, in questa maniera, sarebbe
+obbligatorio utilizzare come velocità target dei valori che sono dei
+multipli della scala}, i quali fanno uso dell'errore di velocità per
+ricavare la potenza da applicare ai motori, bisogna trovare un altro metodo
+per il calcolo della velocità media di un motore.
+
+\'E per questo che si è deciso di utilizzare una media mobile che usa le
+ultime $10$ velocità istantanee.
+
+\subsection[Task ``PID\_Controller'']{Task ``PID\_Controller'': Calcolo ed
+attuazione delle potenze dei Motori}\label{sec:BROPIDS}
+Siccome, anche a causa delle ``scarse''\footnote{Si faccia riferimento alla
+sezione \ref{sec:BROTooth} per avere un'idea di questo problema}
+prestazioni del BlueTooth sotto \nxtOSEK{}, non sappiamo esattamente quando 
+saranno presenti dei nuovi dati per il controllo dei motori abbiamo bisogno
+di un Task per il controllo periodico dei motori.
+
+\'E per questo motivo che è stato implementato un Task periodico che, ogni
+$5ms$, utilizza i dati per regolare la potenza dei vari motori.
+
+Nel caso di controllo diretto delle potenze dei motori questo compito non è
+particolarmente grave. Al Task, infatti, basta utilizzare l'ultimo valore
+ricevuto come potenza da settare per il motore interessato.
+
+\graffito{L'uso del \PID{}}
+Quando, invece, viene richiesto di settare una determinata velocità il Task
+deve far uso del \PID{}\footnote{Si faccia riferimento alla sezione
+\ref{sec:PIDTheo} per un'idea migliore di cosa sia un \PID{}} implementato
+tra le API del progetto.
+
+Questo usa le ultime tre potenze utilizzate per il motore preso in
+considerazione e le ultime tre differenze tra le velocità medie e la
+velocità richiesta per calcolare la potenza da utilizzare per fare in modo
+che i motori vadano alla velocità corretta. Una volta calcolato questo
+valore lo utilizzano per far muovere i motori alla velocità richiesta
+dall'utente.
+
+\subsection[Task ``DisplayTask'']{Task ``DisplayTask'': Visualizzazione dei
+dati sullo schermo LCD}\label{sec:BROLCDS}
+Il compito di questo Task, eseguito ogni $1000ms$, è quello di fornire un
+contatto con l'utente attraverso l'output di vari dati sull'LCD del Brick
+dello \SPAM{}.
+
+Questi dati sono configurabili, ovviamente, ma nella versione standard del
+Client \BROFist{} i dati mostrati sono quelli raccolti dalla chiamata di
+\nxtOSEK{} \codeconst{ecrobot\_status\_monitor(target\_name)}.
+
+\subsection{Il Protocollo per \BROFist{}}\label{sec:theProtocol}
+Per la comunicazione tra \SPAM{} e PC, ovviamente, si è resi necessari lo
+studio e la realizzazione di un protocollo con il quale codificare le
+richieste per lo \SPAM{}.
+
+Per rendere questo lavoro più semplice è stato optato l'approccio più
+facilmente implementabile in C, ovvero l'utilizzo di una struttura
+contenente:
+\graffito{Struttura di un \BROFist{}}
+\begin{itemize}
+    \item La codifica di quale sensore richiedere o di quale tipo di valore
+        per il controllo dei motori è stato inviato. Per questa codifica si
+        è deciso di utilizzare una variabile di tipo \codeconst{uint8_t},
+        in quanto si è considerato che non esisteranno più di
+        254\footnote{In quanto uno dei comandi dev'essere quello che
+        dichiara finita la comunicazione} comandi
+        differenti\footnote{Comunque la struttura del progetto è tale che,
+        quando qualcuno deciderà di implementare più del massimo consentito
+        da questo tipo di variabile, questo cambiamento sarà rapido e senza
+        troppi problemi}
+    \item La porta alla quale il sensore o servo motore è collegato. Anche
+        questa codifica viene registrata all'interno di una variabile di
+        tipo \codeconst{uint8_t}, vista la presenza di solo $7$ porte sul
+        Brick \emph{NXT}.
+    \item Il valore da settare in caso venisse inviata una richiesta di
+        controllo di servo motori oppure il valore letto dal sensore
+        richiesto. Per questo valore viene usata una variabile di tipo
+        \codeconst{float}, in quanto la velocità richiesta potrebbe essere
+        di tipo decimale, come la velocità media di un servo motore.
+\end{itemize}
+
+\graffito{Le codifiche delle richieste}
+Al momento sono stati utilizzate le seguenti codifiche per le
+richieste\footnote{Le quali sono definite, assieme a quelle per le porte,
+all'interno del file header \cypher{broi\_fist.h} posto all'interno della
+cartella \cypher{src/headers}}:
+\begin{description}
+    \item[LIGHT\_SENSOR] codificato come $1$, serve per la richiesta del
+        valore letto da un sensore di luce
+    \item[TOUCH\_SENSOR] codificato come $2$, serve per la richiesta del
+        valore di un sensore di tocco
+    \item[SOUND\_SENSOR] codificato come $3$, serve per la richiesta del
+        valore registrato da un sensore di suono
+    \item[RADAR\_SENSOR] codificato come $4$, serve per la richiesta della
+        distanza letta da un sensore di distanza ad ultrasuoni
+    \item[TACHO\_COUNT] codificato come $6$, serve per la richiesta del
+        valore attuale del Tachimetro di un motore
+    \item[AVG\_SPEED] codificato come $7$, serve per la richiesta della
+        velocità media di un motore
+    \item[SET\_SPEED] codificato come $8$, serve per inviare una velocità da
+        settare ad un motore
+    \item[SET\_POWER] codificato come $9$, serve per inviare una potenza
+        ``grezza'' da settare ad un motore
+\end{description}
+
+Mentre le codifiche delle porte sono le seguenti:
+\begin{description}
+    \item[PORT\_1\textasciitilde{}4] codificate con i valori
+        $1$\textasciitilde{}$4$, servono per applicare la richiesta ad una
+        delle quattro porte per i sensori.
+    \item[MOTOR\_A\textasciitilde{}C] codificate con i valori
+        $5$\textasciitilde{}$7$, servono per applicare la richiesta ad una
+        delle tre porte per i motori.
+\end{description}
+
+\section{Codice degno di nota e Strutture}
+Le varie funzionalità presenti all'interno del Client installato sullo
+\SPAM{} sono possibili grazie all'utilizzo di una serie di funzioni ed
+all'utilizzo di strutture condivise tra tutto il progetto, qui vedremo una
+parte dell'API presente nel codice del Client e le due strutture necessarie
+al suo funzionamento, ovvero quella dei motori e quella per la definizione
+dei \emph{BROFists}.
+
+\cleardoublepage
