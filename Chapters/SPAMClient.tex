@@ -1,4 +1,4 @@
-\chapter{Il Client per SPAM di BROFist}
+\chapter{Il Client di BROFist per SPAM}
 \label{chap:SPAMC}
 
 In questo capitolo parleremo dello svilupppo del client per \SPAM{} del
@@ -9,7 +9,7 @@ possono venir riutilizzate in altri progetti.
 Il robot sul quale è stato creato l'intero progetto non è sempre stato
 nella forma attuale. All'inizio il modello utilizzato era quello proposto
 dalla \emph{Lego} nelle istruzioni base contenute nelle scatole dei
-\nxt{} (Si faccia riferimento all'immagine\ref{img:orignxt}).
+\nxt{} (Si faccia riferimento all'immagine \ref{img:orignxt}).
 \image  {Pictures/StandardNXT}
         {Una delle versioni base di un \nxt{}, costruita seguendo le
         istruzioni contenute nei kit forniti dalla lego}
@@ -37,7 +37,7 @@ delle richieste iniziali per il progetto, ovvero avere la possibilità di
 montare un sensore di distanza brandeggiabile parallelo al terreno ed un
 sensore di luce puntato verso il terreno a circa un centimetro da esso.
 \graffito{La necessità di avere il sensore parallelo al terreno}
-Il sensoore di distanza doveva venir necessariamente montato in maniera
+Il sensore di distanza doveva venir necessariamente montato in maniera
 parallela rispetto al terreno in quanto il sistema di rilevamento della
 distanza funziona con l'utilizzo di ultrasuoni. Questi vengono emessi dal
 sensore il quale, misurando dopo quanto tempo ritorna l'onda, calcola la
@@ -49,10 +49,10 @@ distanza dall'ostacolo puntato (Fare riferimento all'immagine
         {1}
         {img:sonarpr}
 
-Questo sitema, però, è influenzato dall'angolazione della superficie
+Questo sistema, però, è influenzato dall'angolazione della superficie
 rispetto all'origine dell'onda, in quanto, se questa non è perpendicolare o
-di pochi gradi differente rispetto all'angolo retto, l'onda viene
-rimbalzata in una direzione differente da quella d'origine. Questo fa in
+di pochi gradi differente rispetto all'angolo retto, l'onda 
+rimbalza in una direzione differente da quella d'origine. Questo fa in
 modo che non torni al sensore, il quale pensa di non aver alcun ostacolo di
 fronte a se, oppure di averlo più lontano di quanto non lo sia realmente.
 
@@ -70,7 +70,7 @@ Come già detto in precedenza (sezione \ref{sec:BROClient}) il client
 \BROFist{} gira su un sistema \nxtOSEK{}, il quale fornisce tutte le
 funzionalità real time necessarie all'esecuzione con deadlines richieste da
 questo tipo di progetto. Il client è formato da quattro Task, i quali
-collaborano per il controllo dello \SPAM e per la comunicazione con il PC.
+collaborano per il controllo dello \SPAM{} e per la comunicazione con il PC.
 
 Per ricapitolare i quattro Task hanno le seguenti mansioni:
 \begin{itemize}
@@ -107,7 +107,7 @@ buffer del controller BlueTooth e quindi li interpreta.
 \graffito{Perchè sette \emph{BROFists}}
 La scelta di inviare sette \emph{BROFists} alla volta è data dal fatto che
 sono presenti solo sette porte per la connessione di motori o sensori,
-quindi l'idea è quella che le richieste non dovrebbero essere superiori a
+quindi l'idea è che le richieste non dovrebbero essere superiori a
 quel numero. \'E anche vero che le persone potrebbero richiedere due dati
 differenti dallo stesso Servo Motore, però si è considerato che un
 programmatore possa derivare uno dei due valori avendo il primo.
@@ -127,7 +127,7 @@ conformazione della struttura dei dati per il controllo dei motori}.
 Una volta interpretati tutti i \emph{BROFists} il client forma una serie di
 \emph{BROFists} di risposta, i quali contengono la richiesta ed il dato ad
 essa correlato. Nel caso di potenza o velocità dei motori il dato è sempre
-0.
+$0$.
 
 \subsection[Task ``Speed\_Updater'']{Task ``Speed\_Updater'': Calcolo delle
 velocità istantanee}\label{sec:BROSpdS}
@@ -146,9 +146,9 @@ Facendo ciò, dunque, avremo abbastanza dati per poter calcolare la velocità
 media su \cypher{(5 * Dimensione dell'array circolare)ms}.
 
 \subsubsection{Problemi derivanti dall'uso dei valori dei Tachiometri}
-Il valore di ogni Tachiometro viene registrata all'interno di una variabile
+Il valore di ogni Tachiometro viene registrato all'interno di una variabile
 di tipo \codeconst{int32_t}. Questo \emph{potrebbe} portare a dei problemi
-dati dall'\emph{Overflow} o dall'\emph{Underflow} dato dall'eccessivo
+dati dall'\emph{overflow} o dall'\emph{underflow} dato dall'eccessivo
 utilizzo dei motori.
 
 Questo, però, occorrerebbe soltanto dopo una rotazione continua, in una o
@@ -182,12 +182,13 @@ A causa di questo, infatti, la sensibilità della velocità diventa, appunto,
 pari alla scala che va applicata alla velocità per ogni intervallo di
 Sampling.
 
-Siccome una sensibilità tale non è utile, in quanto è inusabile dai vari
-algoritmi di controllo\footnote{Anche perchè, in questa maniera, sarebbe
-obbligatorio utilizzare come velocità target dei valori che sono dei
-multipli della scala}, i quali fanno uso dell'errore di velocità per
-ricavare la potenza da applicare ai motori, bisogna trovare un altro metodo
-per il calcolo della velocità media di un motore.
+Una sensibilità tale non è utile, in quanto inusabile dai vari algoritmi
+di controllo\footnote{Anche perchè, in questa maniera, sarebbe obbligatorio
+utilizzare come velocità target dei valori che sono dei multipli della
+scala} visto che fanno uso dell'errore di velocità per ricavare la potenza da
+applicare ai motori. Bisogna perciò trovare un altro metodo per il calcolo della
+velocità media di un motore con i dati che ricaviamo dalla lettura
+periodica dei Tachiometri.
 
 \'E per questo che si è deciso di utilizzare una media mobile che usa le
 ultime $10$ velocità istantanee.
@@ -295,12 +296,144 @@ Mentre le codifiche delle porte sono le seguenti:
         delle tre porte per i motori.
 \end{description}
 
-\section{Codice degno di nota e Strutture}
-Le varie funzionalità presenti all'interno del Client installato sullo
-\SPAM{} sono possibili grazie all'utilizzo di una serie di funzioni ed
-all'utilizzo di strutture condivise tra tutto il progetto, qui vedremo una
-parte dell'API presente nel codice del Client e le due strutture necessarie
-al suo funzionamento, ovvero quella dei motori e quella per la definizione
-dei \emph{BROFists}.
+\section{BlueTooth e relativi problemi sullo SPAM}
+I \nxt{} hanno due modi per comunicare con l'esterno: usando
+l'\techname{USB} oppure il \techname{BlueTooth}. Nel progetto \BROFist{} si
+è deciso di utilizzare la tecnologia \techname{BlueTooth} visto che il
+progetto era puntato ad un utilizzo per la rilevazione telemetrica e per il
+controllo realtime di un'unità \emph{NXT}, cosa che poteva risultare
+complicata con la presenza costante di un cavo USB collegato all'unità.
+
+Parleremo dunque prima della tecnologia in generale per poi spostarci ai
+vari test che sono stati effettuati per calcolare la latenza delle
+comunicazioni tra PC e \SPAM{} ed, infine, parleremo dei problemi
+riscontrati nell'uso delle API di \nxtOSEK{} per l'uso del
+\techname{BlueTooth}.
+
+\subsection{Il BlueTooth}
+Il \techname{BlueTooth} è uno standard Open per le comunicazioni a corto
+raggio sviluppato dalla \emph{Ericsson} nel 1994. Questo permette la creazione di
+\techname{Personal Area Network} ad alti livelli di sicurezza.
+
+\graffito{Origine del nome BlueTooth}
+Questa tecnologia deriva il suo nome dalla traduzione in inglese
+dell'epiteto dato al re ``Aroldo I di Danimarca''. Il logo, invece, è la
+runa derivata dall'unione delle rune che sono le iniziative del nome di
+Aroldo: \textarn{h} e \textarn{b}.
+
+\graffito{Funzionamento del BlueTooth}
+Il \techname{Bluetooth} funziona tramite l'utilizzo di una tecnologia radio
+chiamata \emph{Frequency-Hopping Spread Spectrum}. Questa tecnologia
+suddivide i dati che vanno inviati e li trasmette su un numero massimo di
+79 bande da $1$MHz l'una, tutte comprese nel range da $2402$ a $2480$MHz.
+
+Il \techname{BlueTooh} utilizza un protocollo di comunicazione a pacchetti
+con una struttura \emph{Master-Slave}, la quale permette la presenza di un
+\emph{Master} e fino a $7$ \emph{Slaves} all'interno della stessa
+\emph{picoNet}. Lo scambio di pacchetti viene regolato sul clock base,
+regolato dal Master, il quale ha un intervallo di $312.5\mu{}s$. Il Master
+utilizza gli slot per la comunicazione in maniera alternata: invia negli
+slot pari e riceve in quelli dispari. I vari client, al contrario, ricevono
+durante gli slot pari ed inviano in quelli dispari.
+
+Questa struttura permette una comunicazione a corto raggio con un basso
+consumo energetico. Il raggio di comunicazione è dato dalla classe del
+device Bluetooth, andando da $1$m fino a $100$m.
+
+La velocità massima di trasferimento è, nella maggior parte dei casi, di
+$24$Mbit/s.
+
+\subsubsection{La latenza della comunicazione BlueTooth tra PC ed
+NXT}\label{sec:BROTooth} 
+Prima di sviluppare completamente il sistema bisognava essere sicuri di
+quanto tempo trascorresse tra l'invio di un \BROFist{} e la ricezione della
+risposta, oltre al numero di errori di trasmissioni.
+
+Per questo sono stati fatti un gran numero di test, prima solo in
+ricezione, poi sia in invio che in ricezione. Questi test prevedevano il
+cambiare distanza tra PC e \SPAM{}, aumentare gradualmente il numero di
+test oppure cambiare la dimensione dei pacchetti inviati.
+
+\graffito{I test di comunicazione SPAM $\rightarrow$ PC}
+La prima serie di test effettuati prevedeva la ricezione di pacchetti in
+serie spediti direttamente dallo \SPAM{} senza invii da parte del PC per la
+sincronizzazione. Dopo una serie di test si è notato che la velocità di
+comunicazione si attestava intorno ai $2ms$ e che non c'erano perdite di
+dati durante le comunicazioni.
+
+\graffito{I test di comunicazione PC $\rightarrow$ SPAM $\rightarrow$ PC}
+Una volta completati i test per la comunicazione unidirezionale è stato il
+turno di quelli bidirezionali, i quali prevedevano una sincronizzazione tra
+PC e \SPAM{}.
+
+Durante la prima fase dei test, eseguiti a varie distanze, tutte tra $1$ e
+$10$ metri, la latenza delle comunicazioni, eseguite $100000$ alla volta, si
+attestava intorno ai $4ms$.
+
+Una volta controllati gli errori di comunicazione, però, si è notato che i
+pacchetti ricevuti erano tutti errati. Molti dati non arrivavano,
+sostituiti da valori casuali, tipici di letture di settori di memoria
+errati. Questo ha portato ad una serie di test per la comprensione di quale
+fosse il problema, oltre che a delle lunghe sessioni di \emph{Bugfixing}.
+Dopo quasi un'intera settimana di lavoro intensivo, più di $50$ versioni
+differenti di Server e Client e del \emph{Retro-Engineering} del codice dei
+Device drivers di \nxtOSEK{} si è finalmente capito quale fosse il
+problema.
+
+\graffito{Problemi del BlueTooth sotto \nxtOSEK{}}
+Il problema risiede sia nei Device Drivers che nel Controller BlueTooth
+dei \nxt{}. La parte di problema dei Device Driver parte dal fatto che, pur
+essendo presente un \techname{DMA} sulla piattaforma Hardware, non vengano
+utilizzati gli Interrupt per gestire le comunicazioni via BlueTooth.
+Infatti la chiamata che legge i dati da BlueTooth altro non fa che
+controllare se sono presenti dei dati nel Buffer del
+Controller\footnote{Richiedendo queste informazioni niente di meno che al
+\techname{DMA} stesso} e quindi copiarli solo se sono esattamente quanti
+indicati nel primo byte di dati ricevuti\footnote{In realtà lo spazio
+``riservato'' per questa informazione dovrebbe essere di 2 byte, il secondo
+dei quali viene ignorato dalla chiamata. Inoltre bisogna passare, come
+parametro della funzione di lettura dei dati, la quantità di dati da
+leggere. Una ridondanza di dati quasi inutile.} Questo fa sì che sia
+necessario l'utilizzo di un approccio di \emph{polling} non bloccante,
+creando un Task ad esecuzione periodica.
+
+Questo Task dovrà agire soltanto quando ci sarà una risposta affermativa da
+parte della funzione di lettura dei dati. Il problema dato da questo
+approccio è quello derivato dalla perdita di tempo in caso i dati si
+rendano disponibili tra un'esecuzione del Task ed un'altra.
+
+Il ritardo, però, è stato limitato dando al Task un periodo di $2ms$,
+facendo in modo che non possa trascorrere più di $1ms$ tra la ricezione
+completa e l'utilizzo dei dati.
+
+Utilizzando questo metodo, dopo una lunga serie di test da $30000$
+comunicazioni bidirezionali alla volta, ha portato la latenza a $45ms$, ma
+il numero di errori è stato portato a $0$.
+
+Questo, dunque, ci porta ad un'altra considerazione: se il ritardo è al
+massimo di $1ms$ vuol dire che l'errore è in un altro punto. Questo ci
+porta all'idea che, probabilmente, le prestazioni del Controller BlueTooth
+installato sui \nxt{} non siano ottime come si sperava. Questa, però, è una
+congettura in quanto non c'è un modo sicuro per dimostrare questo fatto.
+
+\section{Problemi di sviluppo}
+Durante lo sviluppo del Client sullo \SPAM{} e anche durante il
+conseguimento delle abilità necessarie per il suo sviluppo sotto
+\nxtOSEK{} ci sono stati dei problemi che hanno portato ad un sensibile
+rallentamento di queste attività.
+
+Oltre al problema di dover creare l'immagine da caricare sull'\nxt{} ogni
+volta e poi caricarla riavviando tutto il sistema, cosa che prendeva al
+mimimo un minuto al ciclo di spegnimento, carica dell'immagine ed
+esecuzione, l'impedimento più grande è stato quello della mancanza di un
+debugger.
+
+Ogni volta che si presentava un bug non c'era modo di capire da cosa fosse
+dovuto se non con una lunghissima serie di test e di letture di dati sullo
+schermo LCD. Inoltre neanche quest'ultimo metodo era sempre disponibile in
+quanto quando avveniva un qualche problema di lettura dei dati dalla
+memoria sullo schermo compariva il messaggio \cypher{DATA ABORT} e l'intera
+unità si bloccava, rimuovendo qualunque messaggio che era stato scritto
+sul Display.
 
 \cleardoublepage
