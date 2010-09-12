@@ -2,8 +2,8 @@
 \label{chap:SPAMC}
 
 In questo capitolo parleremo dello svilupppo del client per \SPAM{} del
-progetto \BROFist{}, dei problemi riscontrati e delle funzionalità che
-possono venir riutilizzate in altri progetti.
+progetto \BROFist{}, dei problemi riscontrati e dei test effettuati per
+limitarne l'impatto.
 
 \section{Creazione di SPAM}
 Il robot sul quale è stato creato l'intero progetto non è sempre stato
@@ -343,7 +343,7 @@ device Bluetooth, andando da $1$m fino a $100$m.
 La velocità massima di trasferimento è, nella maggior parte dei casi, di
 $24$Mbit/s.
 
-\subsubsection{La latenza della comunicazione BlueTooth tra PC ed
+\subsection{La latenza della comunicazione BlueTooth tra PC ed
 NXT}\label{sec:BROTooth} 
 Prima di sviluppare completamente il sistema bisognava essere sicuri di
 quanto tempo trascorresse tra l'invio di un \BROFist{} e la ricezione della
@@ -410,6 +410,7 @@ Utilizzando questo metodo, dopo una lunga serie di test da $30000$
 comunicazioni bidirezionali alla volta, ha portato la latenza a $45ms$, ma
 il numero di errori è stato portato a $0$.
 
+\graffito{I probabili problemi dati dal Controller BlueTooth}
 Questo, dunque, ci porta ad un'altra considerazione: se il ritardo è al
 massimo di $1ms$ vuol dire che l'errore è in un altro punto. Questo ci
 porta all'idea che, probabilmente, le prestazioni del Controller BlueTooth

@@ -1,0 +1,47 @@
+\chapter{Il Server di BROFist per PC}
+\label{chap:PCServ}
+
+In questo capitolo parleremo dello sviluppo del Sever per PC
+del progetto \BROFist{} e delle librerie utilizzate.
+
+\section{La struttura di BROFist}
+Il progetto \BROFist{} è formato da tre parti ben distinte tra di loro:
+
+\begin{description}
+    \item[Un Client su NXT]il quale deve ricevere degli ``ordini'' ed
+        eseguirli per poi inviare al Server i risultati di questi ordini.
+    \item[Un Server su PC]il quale riceve degli ordini per lo \SPAM{} da
+        parte dell'interfaccia grafica ed invia questi ordini al client in
+        esecuzione sull'unità.
+        
+        Una volta ricevuta la risposta dal Client questa viene inoltrata
+        all'interfaccia.
+    \item[Dei blocchi d'interfaccia per SciCos]i quali si collegano al
+        server, grazie al quale possono comunicare con lo \SPAM{} ed
+        utilizzare i dati ricevuti nelle simulazioni.
+\end{description}
+
+Questa schematizzazione, però, è frutto di una lunga progettazione, la
+quale è stata necessaria per creare il sistema più flessibile possibile,
+oltre ad oltrepassare delle limitazioni del pacchetto grafico di
+simulazione e modellazione \techname{SciCosLab}.
+
+\subsection{La struttura di BROFist nel tempo}
+\graffito{La prima versione}
+L'idea iniziale era di creare semplicemente un logger che inviava in
+realtime vari dati calcolati dal software in esecuzione sullo \SPAM{}, i
+quali venivano ricevuti da un server scritto in \techname{Python}.
+
+Il problema di questa struttura, però, era la mancanza di flessibilità, in
+quanto, ogni volta che venivano cambiati i dati inviati, bisognava cambiare
+il codice del server. Questo perchè il metodo utilizzato per
+l'interpretazione dei dati ricevuti via \techname{BlueTooth} prevedeva
+l'utilizzo della funzione \codeconst{struct.unpack}, la quale richiede una
+stringa che indica la struttura dei dati da interpretare.
+
+\graffito{La decisione di sviluppare un protocollo}
+Per risolvere questo problema si è quindi deciso di sviluppare un sistema
+che facesse uso di un protocollo per la richiesta di dati dei sensori e per
+il controllo da remoto dei motori.
+
+\cleardoublepage
