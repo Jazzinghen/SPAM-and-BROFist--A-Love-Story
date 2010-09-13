@@ -44,4 +44,97 @@ Per risolvere questo problema si è quindi deciso di sviluppare un sistema
 che facesse uso di un protocollo per la richiesta di dati dei sensori e per
 il controllo da remoto dei motori.
 
+Questo, però, richiedeva lo sviluppo di un sistema che, ricevute le
+richieste, si comportasse in accorodo con esse. \'E per questo che il
+sistema è passato da un'applicazione che inviava dati ad un PC ad un
+modello \techname{Client-Server}.
+
+Per creare il Server, dunque, si è deciso di utilizzare \techname{C} invece
+che \techname{Python}, in quanto c'era bisogno di una gestione delle
+strutture a basso livello e di prestazioni migliori\cite{bib:progbench}.
+
+La scelta di passare a \techname{C}, però, ha richiesto del tempo per
+arrivare alle competenze necessarie\footnote{La quale, però, che è stata
+facilitata grazie alla documentazione presente online
+\cite{bib:blueZdocs}}.
+
+\graffito{L'idea di creare dei blocchi d'interfaccia per SciCosLab}
+Vista la possibilità di comunicare via \techname{BlueTooth} utilizzando
+\techname{C} invece di \techname{Python} si è reso automaticamente
+disponibile lo sviluppo di blocchi di codice per \techname{SciCosLab}.
+Questo ha reso necessario lo strutturare il progetto in modo che
+funzionasse tra blocchi di \techname{SciCosLab} ed il Client su \SPAM{}.
+
+Dunque l'idea iniziale era quella di sviluppare il progetto in direzione di
+un modello \emph{Client-Server} tra \techname{SciCosLab} ed \techname{NXT}.
+Purtoppo, però, il pacchetto di modellazione \techname{SciCos} integrato in
+\techname{SciCosLab} manca della flessibilità necessaria\footnote{Si faccia
+riferimento al paragrafo \ref{sec:whyitsucks} per capire meglio quali sono
+i problemi derivanti dallo sviluppo di blocchi in \techname{C} per
+\techname{SciCos}} per sviluppare questo progetto.
+
+\graffito{Il modello SciCosLab - Server - SPAM Client}
+\'E grazie a questa serie di tentativi e di modelli che si è arrivati
+all'idea finale per il progetto \BROFist{}, la quale prevede l'utilizzo di
+blocchi d'interfaccia per \techname{SciCosLab}, i quali comunicazno con un
+server che gira sullo stesso computer\footnote{Anche se, grazie alla
+struttura data al progetto, non è escluso che si possa utilizzare un server
+in remoto}, connesso ad uno \SPAM{} via \techname{BlueTooth}.
+
+Grazie al questa struttura, dunque, abbiamo un sistema flessibile che
+permette la sua estensione in base alle necessità dell'utente.
+
+\section{Le ragioni dello sviluppo di un Server}
+Abbiamo già detto che una delle motivazioni per la scelta di un modello
+basato su server era la poca flessibilità data dallo sviluppo di blocchi
+per \techname{SciCos}. Ovviamente questo non è stato l'unico fattore che ha
+portato alla scelta fatta.
+
+Il punto forte di questo sistema è l'estensibilità data dall'uso dei
+\techname{Socket UNIX} e dal fatto che il codice utilizzato per comunicare
+con l'\techname{NXT} è separato dall'applicazione che la necessita. La
+schematizzazione di questa struttura e delle possibili estensioni future è
+rappresentata nell'immagine \ref{img:BROFistStruct}
+
+\image  {Images/TheBROFistStructure}
+        {La struttura del progetto \BROFist{}, con i possibili sviluppi
+        futuri, segnati come delle linee viola tratteggiate}
+        {.8}
+        {img:BROFistStruct}
+
+Questo permette, conoscendo le strutture utilizzate per la comunicazione,
+di sviluppare applicazioni di qualunque tipo che sfruttano il server per
+comunicare con un'unità \SPAM{}, controllarne i motori oppure ricevere dati
+dei vari sensori.
+
+\graffito{Esempio di applicazione alternativa per BROFist: Web Interface}
+Mettiamo, ad esempio, di voler creare un esperimento sociale attreverso la
+rete dove la gente può prenotare l'utilizzo di un'unità \SPAM{} alla quale
+è stata aggiunta una Webcam. Questa unità è stata posta all'interno di uno
+spazio chiuso con vari oggetti coi quali interagire, ostacoli ed altro.
+
+Per sviluppare questo progetto sarebbe necessaria un'interfaccia Web la
+quale si collega via remoto ad un server \BROFist{} il quale manderebbe i
+pacchetti di ordini allo \SPAM{} e spedirebbe indietro i dati letti dai
+sensori, oltre che alle immagini della Webcam\footnote{Anche se i dati
+della Webcam verrebbero gestiti dall'interfaccia Web.}.
+
+\graffito{Gli altri sviluppi resi possibili dall'uso di un server}
+Oltre alla possibilità di creare applicazioni ``ad hoc'' che usano il
+server \BROFist{} questo tipo modello ci permette anche di estendere i
+metodi di connessione del server allo \SPAM{}.
+
+Per ora il sistema comunica solo via \techname{BlueTooth} però uno dei
+possibili sviluppi futuri\footnote{Per quanto sia complesso utilizzare
+l'\techname{USB}, visto che il supporto LibUSB è stato rimosso da
+\nxtOSEK{} dalla release del 2009} potrebbe essere l'abilitazione delle
+comunicazioni via \techname{USB} con l'unità \techname{NXT}.
+
+Inoltre altre aggiunte potrebbero venir applicate a Client e Server per
+permettere la comunicazione dei contenuti di variabili ben definite, oppure
+per il controllo delle periferiche collegate alla porta \techname{RS485}.
+
+\section{Dipendenze funzionali del Server}
+
+
 \cleardoublepage

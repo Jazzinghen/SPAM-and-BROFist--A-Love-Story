@@ -104,13 +104,23 @@ Task con un'esecuzione ciclica ogni \cypher{2ms}, il quale recupera sette
 \emph{BROFists} contemporaneamente quando sono presenti all'interno del
 buffer del controller BlueTooth e quindi li interpreta.
 
-\graffito{Perchè sette \emph{BROFists}}
+\graffito{Perchè sette \emph{BROFists}}\label{sec:why7}
 La scelta di inviare sette \emph{BROFists} alla volta è data dal fatto che
 sono presenti solo sette porte per la connessione di motori o sensori,
 quindi l'idea è che le richieste non dovrebbero essere superiori a
 quel numero. \'E anche vero che le persone potrebbero richiedere due dati
 differenti dallo stesso Servo Motore, però si è considerato che un
 programmatore possa derivare uno dei due valori avendo il primo.
+
+Una secondo fattore che ha portato a questa scelta è stato quello della
+latenza delle comunicazioni\footnote{Del quale parleremo in maniera più
+estesa nel paragrafo \ref{sec:BROTooth}.}. Avendo una latenza media di
+$45ms$ per ogni comunicazione \techname{BlueTooth} bisogna dunque ridurre
+al massimo il numero di comunicazioni per ridurre l'impatto della latenza.
+Se noi mandassimo un \BROFist{} per ogni comunicazione avremmo una latenza
+di, appunto, $45ms$ per dato richiesto. Se noi, invece, inviamo un
+pacchetto di richieste la latenza per dato diventa $45ms/Dati Richiesti$,
+ovvero, nel nostro caso $45ms/7=6.43ms$, una latenza molto più accettabile.
 
 \graffito{L'uso dei dati ricevuti}
 Quando le richieste riguardano l'invio del dato letto da un sensore non ci
@@ -239,7 +249,7 @@ richieste per lo \SPAM{}.
 Per rendere questo lavoro più semplice è stato optato l'approccio più
 facilmente implementabile in C, ovvero l'utilizzo di una struttura
 contenente:
-\graffito{Struttura di un \BROFist{}}
+\graffito{Struttura di un \BROFist{}}\label{sec:BROStruct}
 \begin{itemize}
     \item La codifica di quale sensore richiedere o di quale tipo di valore
         per il controllo dei motori è stato inviato. Per questa codifica si
@@ -408,7 +418,11 @@ completa e l'utilizzo dei dati.
 
 Utilizzando questo metodo, dopo una lunga serie di test da $30000$
 comunicazioni bidirezionali alla volta, ha portato la latenza a $45ms$, ma
-il numero di errori è stato portato a $0$.
+il numero di errori è stato portato a $0$. Questo tempo, inoltre, non
+cambiava al cambiare il numero di dati inviati. I test sono stati
+effettuati con un singolo \BROFist{} all'inizio e poi sette\footnote{Vedere
+il paragrafo \ref{sec:why7} per capire meglio perchè inviamo sette
+\BROFist{} alla volta.} e non ci sono stati cambiamenti nella latenza.
 
 \graffito{I probabili problemi dati dal Controller BlueTooth}
 Questo, dunque, ci porta ad un'altra considerazione: se il ritardo è al
