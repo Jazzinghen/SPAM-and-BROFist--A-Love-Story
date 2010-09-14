@@ -134,6 +134,122 @@ Inoltre altre aggiunte potrebbero venir applicate a Client e Server per
 permettere la comunicazione dei contenuti di variabili ben definite, oppure
 per il controllo delle periferiche collegate alla porta \techname{RS485}.
 
+\section{Il funzionamento del server}
+Il server è diviso in quattro moduli separati, ognuna con delle funzioni
+ben specifiche. Le quattro parti separate sono:
+
+\begin{description}
+    \item[Controllo BlueTooth]che contiene tutte le funzioni per la
+        connessione e la comunicazione attraverso \techname{BlueTooth}
+    \item[Controllo Socket UNIX]che contiene tutte le funzioni per la
+        gestione del server, la comunicazione via \techname{Socket UNIX} e
+        la sua interazione con le comunicazioni \techname{BlueTooth}
+    \item[Parsing delle Opzioni]che si occupa di fare il \emph{parsing}
+        delle opzioni e quindi comportarsi di conseguenza.
+    \item[Il Server BROFist]il quale utilizza i dati settati dal Parser per
+        iniziare le comunicazioni, fare il forwarding dei dati e quindi
+        bloccarsi quando riceve l'ordine di stop.
+\end{description}
+
+Vedremo ora le varie funzionalità di ogni modulo, parlando anche delle
+strutture utilizzate.
+
+\subsection[bro\_bt]{bro\_bt: Gestione BlueTooth}
+In questo modulo sono contenute tutte le funzioni per la gestione del
+\techname{BlueTooth} per il server di \BROFist{}. Sono inoltre contenute la
+dichiarazione della struttura per l'identificazione dei device
+\techname{BlueTooth} e le defines per la discovery e per la connessione dei
+devices.
+
+La scrittura di questo modulo, come quello del controllo delle
+comunicazioni via \techname{Socket UNIX}, ha richiesto del tempo per
+comprendere il funzionamento delle \emph{API} di \techname{BlueZ}, il
+\emph{Protocol Stack} ufficiale per Linux.
+
+Le funzioni di questo modulo sono:
+\begin{itemize}
+    \item \codeconst{size_t bro_bt_scan_devices (bro_bt_device_t *)}, la
+        quale serve per la \emph{Discovery} dei device \techname{BlueTooth}
+        in range, inserendoli all'interno di un array di strutture di tipo
+        \codeconst{bro_bt_device_t}.
+
+        Questo serve sia per stampare a video la lista di device, sia per
+        collegarsi ad un device sapendo il suo nome.
+    \item \codeconst{int bro_bt_connect_device (int *, bdaddr_t)}, funzione
+        che serve a connettere un device, conoscendone il \emph{MAC
+        Address}. L'indirizzo dev'essere passato sotto forma di codifica a
+        $6$ bytes, come richiesto dalla libreria
+        \techname{BlueZ}\footnote{Operazione che potrebbe risultare
+        complicata. Fortunatamente \techname{BlueZ} fornisce anche la
+        funzione \codeconst{int str2ba(const char *, bdaddr_t * )}, la
+        quale converte un \emph{MAC Address} da formato stringa a formato a
+        $6$ bytes.}.
+        
+        La connessione viene quindi legata ad un \emph{Socket
+        Descriptor}, che verrà utilizzato dal programma per comunicare con
+        lo \SPAM{}
+    \item \codeconst{int bro_bt_client_fist (bro_fist_t *, bro_fist_t
+        *,int)}, funzione che invia un set di \emph{BROFists} ed aspetta la
+        risposta. Una volta ricevuti i dati dallo \SPAM{} la funzione
+        riempie un set di \emph{BROFists} di egual misura di quelli
+        inviati contenenti i dati richiesti.
+    \item \codeconst{int bro_bt_close_connection{int}}, la quale chiude la
+        comunicazione ed il socket descriptor ad essa collegato.
+\end{itemize}
+
+In questo modulo, inoltre, è presente la dichiarazione della struttura per
+rappresentare un device \techname{BlueTooth} all'interno del progetto
+\BROFist{}, la quale è rappresentata nel listato \ref{lst:BROToothS}
+
+\begin{figure*}[htbp]
+    \begin{lstlisting}[caption=Sample Task-Alarm declaration,
+                       label=lst:BROToothS]
+typedef struct {
+    /** Human Readable Name (As set on the Device). */
+    char       name[248];      
+    /** Mac address stored in a bdaddr_t variable */
+    bdaddr_t   mac;             
+} bro_bt_device_t;
+
+    \end{lstlisting}
+\end{figure*}
+
+\subsection[bro\_comm]{bro\_comm: Gestione Comunicazioni via Socket UNIX}
+Forse il modulo più importante del progetto, \emph{bro\_comm}, contiene le
+funzioni per il controllo dell'\emph{IPC Socket} per la comunicazione con
+le applicazioni sul PC, oltre che all'interazione tra \emph{IPC Socket} e
+\emph{BlueTooth Socket}.
+
+Le funzioni presenti in questo modulo sono solo tre:
+\begin{itemize}
+    \item \codeconst{int bro_start_server (int *, int *)} la quale
+        inizializza il server, aspetta una connessione da un client che
+        utilizza gli \emph{IPC Sockets} e quindi fa il \emph{Bind} di
+        queste due cose a due \emph{socket descriptors}
+    \item \codeconst{int bro_server_fist (const bro_fist_t *, bro_fist_t *,
+        int, int} è la funzione principale dell'intero server. Questa
+        attua la comunicazione tra l'applicazione che richiede l'utilizzo
+        di \BROFist{} e lo \SPAM{}.
+    \item \codeconst{bro_stop_server (int, int)} è la funzione che chiude
+        le comunicazioni via \emph{IPC Socket} ed i socket ad esse
+        collegate.
+\end{itemize}
+
+\subsection[bro\_fist]{bro\_fist: Server e dichiarazioni delle strutture
+utilizzate in tutto il progetto BROFist}
+Le dichiarazioni pubbliche di questo module vengono utilizzate in tutto il
+progetto\footnote{Inclusi blocchi per \techname{SciCosLab} e tasks per
+\nxt{}}, in quanto sono quelle di come sono strutturati i \emph{BROFists},
+le codifiche dei comandi, la posizione del \emph{file descriptor} per la
+connessione al server da parte di altre applicazioni ed il numero di
+\emph{BROFists} inviati per comunicazione.
+
+Questo modulo non contiene funzioni pubbliche, in quanto il file
+\techname{.c} ad esso collegato fa solo da \emph{main} per il server.
+
+Siccome abbiamo già parlato della struttura dei \emph{BROFists} nel paragrafo
+\ref{sec:BROStruct} quì metteremo il codice utilizzato per 
+
 \section{Dipendenze funzionali del Server}
 
 
