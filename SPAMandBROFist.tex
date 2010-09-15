@@ -39,7 +39,7 @@
     nxle_uint32_t, nxle_uint16_t, nxle_int16_t, nxt_protocol_t, action_t,
     atomic, norace, command, event, error_t, signal, call, task, post,
     configuration, implementation, components, as, module, interface,
-    uses, provides, bro_bt_device_t, bdaddr_t}
+    uses, provides, bro_bt_device_t, bdaddr_t, scicos_block}
 }
 \input{VariousStuff/defines}
 \usepackage{}
@@ -49,7 +49,7 @@
     \tableofcontents
     \cleardoublepage
     
-    \input{Chapters/ThanksStuff}
+    %\input{Chapters/ThanksStuff}
     
     \part{Introduzione e Nozioni di base}
     \input{Chapters/Intro}
@@ -58,9 +58,10 @@
     \part{Sviluppo di BROFist}
 
     \input{Chapters/SPAMClient}
-    \input{Chapters/SPAMServer}
+    \input{Chapters/BROFistServer}
+    \input{Chapters/SCICOSBlocks}
 
-    \part{Conclusioni ed Appendici}
+    \part{Apendici}
     \addcontentsline{toc}{chapter}{\bibname}
     
     \input{VariousStuff/bibliography}
