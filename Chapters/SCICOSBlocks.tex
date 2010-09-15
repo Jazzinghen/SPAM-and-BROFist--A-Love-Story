@@ -1,0 +1,395 @@
+\chapter{I blocchi d'interfaccia per SciCos}
+\label{chap:SCICOSB}
+
+In questo capitolo parleremo dei Blocchi d'interfaccia per \SciCos{}, di
+come funzionano e di come interagiscono tra di loro.
+
+Verrà inoltre posta dell'attenzione ai vari problemi che sono insorti
+durante il loro sviluppo, oltre che ai problemi dati dall'interfaccia
+utilizzata.
+
+\section{Struttura ed interazione dei blocchi}
+Come per tutte le parti del progetto anche la progettazione e la
+realizzazione dei blocchi ha richiesto una lunga serie di prototipi e di
+modelli d'interazione tra i blocchi stessi.
+
+\graffito{Funzionalità di ogni Blocco}
+Alla fine si è deciso di dividere il progetto nello schema quì indicato:
+\begin{itemize}
+    \item Un blocco che controlla la comunicazione con il server attraverso
+        gli \emph{IPC Sockets} e passa ai blocchi che attuano la
+        comunicazione il \emph{Socket Descriptor} del server
+    \item Un blocco generico che codifica, in base all'header
+        \cypher{bro\_fist.h} la richiesta per i valori letti da un sensore
+        in base ai dati inseriti dall'utente.
+    \item Un blocco generico che codifica, sempre in base allo stesso file
+        sopra citato, i comandi per attuare i Servo Motori.
+    \item Un blocco che controlla l'invio soltanto dei \emph{BROFists} che
+        richiedono dati dai sensori e della distribuzione dei dati ricevuti
+        in base a queste richieste.
+    \item Un blocco che controlla l'invio soltanto dei \emph{BROFists} che
+        contengono i dati per l'attuazione dei Servo Motori
+\end{itemize}
+
+\graffito{Il perchè della scelta di questa struttura}
+Questa struttura permette una personalizzazione dei dati richiesti senza
+richiedere un grande sforzo all'utente, il quale può porre attenzione al
+modello, invece che al setup per la comunicazione.
+
+\'E anche vero che, a causa della struttura intrinseca di \SciCos{},
+l'utilizzo di questi blocchi è più complicato di quanto non potrebbe
+essere, ma di questo ne parleremo più approfonditamente nella sezione
+\ref{sec:whyitsucks}.
+
+\graffito{Interazioni tra blocchi}
+I blocchi per l'interfacciamento devono venir collegati tra loro in una
+determinata maniera per funzionare correttamente, in quanto richiedono
+specifici dati che solamente gli altri blocchi possono fornir loro.
+
+La porta di output del blocco di controllo delle comunicazioni va collegato
+alla prima porta di ogni blocco per l'invio dei \emph{BROFists}, in quanto
+attraverso quella porta viene comunicato il \emph{Socket Descriptor} per la
+comunicazione col server.
+
+I vari blocchi che inviano \emph{BROFists} hanno una porta (ad esclusione
+della prima) per ogni richiesta che possono inviare. A queste porte vanno
+collegati i blocchi di codifica richiesti\footnote{Se rimangono delle porte
+non utilizzate allora bisogna collegare un blocco con dei dati
+\emph{dummy}, ovvero una matrice $1x3$ così formata $[0;0;0]$, ad ognuna
+delle porte inutilizzate.}, i quali formeranno i \emph{BROFist} inviati.
+
+Nel caso dei blocchi per la richiesta di dati dei sensori sui blocchi sono
+anche presenti delle porte in uscita, una per blocco richiesto, sulle quali
+si renderanno disponibili i dati ricevuti dallo \SPAM{}.
+
+Per i codificatori di richieste di motori, oltre ai parametri settati
+dall'utente, è necessario collegare alla porta d'input di ogni blocco i
+dati da inviare ai motori.
+
+Un esempio di un programma base è mostrato nella figura
+\ref{img:SciCosSampProg}.
+
+\image  {Images/SciCosScreen}
+        {Un programma d'esempio per \SciCos{} che utilizza i blocchi per la
+        comunicazione con uno \SPAM{}}
+        {1}
+        {img:SciCosSampProg}
+
+Adesso parleremo di ogni singolo blocco e delle funzioni che li fanno
+funzionare.
+
+\section[BRO\_Controller]{BRO\_Controller: Blocco di controllo delle
+comunicazioni col server di BROFist}
+\image  {Images/BROController}
+        {Il blocco BRO\_Controller}
+        {.2}
+        {img:BROCont}
+Il blocco \emph{BRO\_Controller} è incaricato di aprire le connessioni con
+il server durante l'inizializzazione, di comunicare agli altri blocchi
+quale \emph{Socket Descriptor} connettersi e quindi, quando viene chiamata
+la finalizzazione della simulazione, di chiudere il socket.
+
+\graffito{Porte del blocco}
+Questo blocco ha soltanto una porta in output, la quale conterrà il valore
+del \emph{Socket Descriptor}. Questo è stato possibile in quanto i
+\emph{Socket UNIX} utilizzano dei descrittori che sono codificati come
+\cypher{integer}. Ciò ha permesso di aggirare uno dei problemi presenti
+all'interno di \SciCos{}, ovvero l'impossibilità di passare dati differenti
+dalla struttura \codeconst{scicos_block} tra il modello grafico e la
+funzione \techname{C}.
+
+\graffito{Funzioni collegate al blocco}
+La funzione che fa da \emph{wrapper} al blocco è \linebreak \codeconst{void
+bro_comm_controller (scicos_block *, int)}, la quale chiama le seguenti
+funzioni in base alla flag passatale:
+\begin{itemize}
+    \item \codeconst{int bro_comm_init(scicos_block *)}, chiamata quando
+        viene passata la flag $4$. 
+
+        Questa funzione apre la comunicazione con il server e assegna alla
+        porta in output il valore del \emph{Socket UNIX}.
+    \item \codeconst{int bro_comm_kill(scicos_block *)}, chiamata quando
+        viene passata la flag $5$.
+
+        Questa funzione chiude il socket aperto con il server.
+\end{itemize}
+
+L'utilità di questo blocco è data dalla necessità di centralizzare il
+controllo del \emph{Socket Descriptor}, evitando così di dover gestire gli
+errori di apertura e chiusura dei \emph{Socket} che inevitabilmente
+insorgerebbero visto il comportamento di \SciCos{}.
+
+\section[SPAM\_Sensor]{SPAM\_Sensor: Blocco di codifica dei sensori}
+\image  {Images/SPAM_Sensor}
+        {Il blocco SPAM\_Sensor}
+        {.4}
+        {img:SPAMSensB}
+I blocchi \emph{SPAM\_Sensor} sono incaricati di convertire i dati inseriti
+dall'utente, in base ad una codifica specifica per \SciCos{}, in richieste
+che seguono il protocollo \BROFist{}.
+
+La funzione collegata al blocco, \codeconst{void bro_motor_enc
+(scicos_block *, int)}, utilizza soltanto una funzione, \codeconst{void
+bro_motor_enc_run (scicos_block *)}, la quale prende i dati settati come
+parametri nella configurazione del blocco e li passa direttamente al blocco
+\emph{SENS\_Disp}, il quale convertirà i dati in accordo con le codifiche
+presenti nel file \cypher{bro\_fist.h}.
+
+\graffito{Il funzionamento del blocco in \SciCos{}}
+Il blocco, inoltre, riesce ad accorgersi della coerenza dei dati settati
+nelle sue proprietà.
+
+I valori che possono venir utilizzati per configurare ogni blocco per la
+codifica dei sensori sono:
+\begin{description}
+    \item[1] per selezionare un Contatore Tachometrico
+    \item[2] per selezionare la velocità media di un motore
+    \item[3] per selezionare un sensore di luuce
+    \item[4] per selezionare un sensore di contatto binario
+    \item[5] per selezionare un sensore acustico
+    \item[6] per selezionare un sensore di distanza ad ultrasuoni
+\end{description}
+
+Mentre i valori che possono venir utilizzati per la selezione del motore o
+del sensore a cui richiedere il valore sono:
+\begin{description}
+    \item[1\textasciitilde{}4] per selezionare un sensore posizionato sulla
+        porta rispettiva
+    \item[5\textasciitilde{}7] per selezionare un motore posizionato su una
+        delle porte da \sc{A} a \sc{C}.
+\end{description}
+
+Inoltre il blocco aggiorna anche il suo aspetto per rispecchiare la scelta
+effettuata dall'utente, facilitando l'utilizzo dei blocchi d'interfaccia.
+
+\section[SENS\_Disp]{SENS\_Disp: Blocco d'invio richieste per i sensori e
+ricezione dei dati relativi}
+\image  {Images/SENS_Disp}
+        {Il blocco SENS\_Disp}
+        {.2}
+        {img:SENSDisp}
+
+Il blocco \emph{SENS\_Disp} è incaricato di raccogliere fino a sette
+richieste da inviare allo \SPAM{} e quindi assegna, quando riceve i dati
+dai blocchi, il valore del sensore alla porta relativa.
+
+Questo blocco, come quello per l'invio dei parametri per i motori, richiede
+un'attivazione esterna tramite clock a causa della strutturazione modellata
+su un sistema discreto, in quanto \SciCosLab{} è un pacchetto per la
+modellazione e la simulazione di sistemi discreti.
+
+La funzione \emph{wrapper} di questo blocco, \linebreak \codeconst{void
+bro_comm_sens_disp (scicos_block *, int)}, utilizza due funzioni per
+l'invio e per la ricezione dei dati dal server. La funzione d'invio, oltre
+alla comunicazione con il server, codifica i dati ricevuti in base alle
+definizioni presenti all'interno del file \cypher{bro\_fist.h} per mantere
+coerenza tra tutte le parti del progetto. Questo permetterà, in caso di
+estensione di funzionalità, di non dover cambiare completamente tutto il
+codice.
+
+Le porte di questo blocco sono otto in input, sette in output ed una per
+l'attivazione esterna. Quelle in input sono una per il \emph{Socket
+Descriptor} e sette per le richieste. Quelle in output, come scritto
+precedentemente, sono per i dati ricevuti dallo \SPAM{}.
+
+\section[SPAM\_Motor]{SPAM\_Motor: Blocco di codifica dei motori}
+\image  {Images/SPAM_Motor}
+        {Il blocco SPAM\_Motor}
+        {.4}
+        {img:SPAMMotor}
+
+Il blocchi \emph{SPAM\_Motor}, similarmente a \emph{SPAM\_Sensor}, servono
+per la codifica dei dati indicati dall'utente per l'invio dei parametri per
+i motori dello \SPAM{}. A parte i valori da settare per configurare il
+blocco questo differisce da quelli per i sensori dalla presenza di una
+porta in entrata che avrà settato il parametro da inviare al motore.
+
+La funzione utilizzata da questi blocchi è \linebreak
+\codeconst{void bro_motor_enc (scicos_block *, int)}, la quale, oltre
+ad assegnare alla porta in output i dati inseriti dall'utente nella
+configurazione del blocco, assegna il dato in input alla porta in output.
+
+I valori utilizzabili per indicare come l'utente vuole controllare il
+motore scelto sono due:
+\begin{description}
+    \item[1] per il controllo diretto della potenza del motore, inviando un
+        valore da $-100$ a $100$
+    \item[2] per il controllo della velocità in \emph{Gradi al Secondo},
+        sfruttando il \PID{}, il quale viene eseguito direttamente sullo
+        \SPAM{}
+\end{description}
+
+\section[MOTOR\_Disp]{MOTOR\_Disp: Blocco d'invio dei parametri per i
+motori}
+\image  {Images/MOTOR_Disp}
+        {Il blocco MOTOR\_Disp}
+        {.2}
+        {img:MOTORSDisp} 
+
+Il blocco \emph{MOTOR\_Disp} recupera fino a tre parametri da inviare ai
+motori dello \SPAM{}.
+
+La funzione collegata a questo blocco è \linebreak \codeconst{void bro_comm_motor_disp
+(scicos_block *, int)}, la quale utilizza un'unica funzione, \codeconst{int
+bro_motor_set (scicos_block *)}, che contiene il codice per effettuare sia
+l'invio che la ricezione di dati dal server, per ridurre al minimo la
+possibilità di \emph{deadlocks}.
+
+Come il blocco \emph{SENS\_Disp} anche questo necessita di un'attivazione
+periodica esterna per funzionare correttamente.
+
+\section{Problemi dello sviluppo di blocchi per SciCos}
+\label{sec:whyitsucks}
+Lo sviluppo dei blocchi per \SciCos{} ha messo in evidenza un gran numero
+di problemi dati dalla struttura del programma che hanno rallentato il
+lavoro non poco.
+
+Faremo ora una lista dei problemi una veloce esposizione dei dettagli.
+
+\subsection{Nessun passaggio di variabili di contesto alle funzioni}
+Ogni volta che viene chiamata una funzione da un blocco di \SciCos{}
+scritta in \techname{C} a questa vengono passati solo due parametri, ovvero
+una struttura definita da \SciCosLab{} ed un \codeconst{int} che funge da
+\emph{flag}.
+
+Questa struttura contiene dati relativi solamente al blocco, senza la
+possibilità di passare nessun altro tipo di dato, rendendo così
+obbligatorio l'utilizzo di variabili globali. Questa è una pessima pratica,
+in quanto rende meno comprensibile il codice, oltre che molto più difficile
+da mantere.
+
+\'E stato per questo motivo che si è deciso di utilizzare le porte dei
+blocchi \SciCos{} per il passaggio del \emph{Socket descriptor}, evitando
+così l'utilizzo di variabili glbali.
+
+\subsection{Mancanza di feedback da parte di \SciCos{} in caso di errore}
+Uno degli strumenti più importanti per lo sviluppatore è il feedback che un
+programma dovrebbe dare un programma quando avviene un errore.
+
+Nel caso di \SciCosLab{} questa funzionalità sembra mancare, in quanto gli
+unici errori che sono stati ricevuti durante lo sviluppo dei blocchi
+avvisavano solo che c'erano stati ``dei problemi con un elemento della
+GUI'' quando era presente un errore nel codice di dichiarazione del blocco
+interessato.
+
+Un altro caso si è verificato quando, per un'incogruenza tra
+il codice scritto in \techname{C} e la dichiarazione del blocco, veniva
+settata una variabile che non era stata allocata da \SciCos{}. L'unico
+errore dato da \SciCos{} è stato ``Type $0$ not yet supported by outtb'',
+senza fornire alcun informazione di contesto. La correzione di questo
+errore ha richiesto moltissime ore di test e di \emph{Retro-Engineer},
+finchè non si è isolato l'errore. Questo bug sarebbe stato corretto molto
+più rapidamente se l'applicazione avesse fornito più informazioni riguardo
+all'errore.
+
+\subsection{Codice sorgente offuscato e senza commenti}
+Quasi ad aumentare il peso di questa mancanza il codice sorgente
+(rilasciato con licenza Open Source) è stato offuscato ed i commenti sono
+stati rimossi.
+
+Per questo la correzione di errori come quello presentato sopra si rende
+ancora più complicato. Per fare un esempio, collegandosi a quello sopra
+citato, \cypher{outtb} è un array ricavato da un secondo array che contiene
+tutti i valori delle porte, il quale a sua volta è contenuto in un terzo
+array che contiene tutti i dati della simulazione. La gestione dei dati di
+ognuno di questi array viene effettuato utilizzando funzioni non
+commentate, rendendo così quasi impossibile la comprensione del
+funzionamento del software.
+
+Se il codice sorgente fosse più comprensibile probabilmente la scrittura di
+funzioni collegate a blocchi per \SciCos{} risulterebbe meno complicato.
+
+\subsection{Mancanza di una comunità di sviluppatori attiva sul Web}
+Gli ultimi due problemi sopra elencati non sarebbero così gravi se fosse
+presente una comunità attiva di sviluppatori di \SciCos{} alla quale
+rivolgersi in caso di errori o per chiarimenti sul funzionamento del
+software.
+
+Basti pensare che sulla rinomata comunità di sviluppatori chiamata
+\techname{StackOverflow} non erano presenti domande su
+\SciCos{}\footnote{Nè, ovviamente, tantomeno risposte} fino all'arrivo del
+redattore di questa tesi, il quale ha provato a presentare un problema
+relativo al sistema per quindi non ricevere risposte per settimane e
+quindi, dopo aver risolto empiricamente il problema, essersi risposto da
+solo\cite{bib:SciCosOnSO}.
+
+\'E stato solo grazie al relatore della tesi che si è potuto contattare uno
+degli sviluppatori, grazie al quale si è venuti a conoscenza del fatto che
+i blocchi per la comunicazione col server necessitavano di un'attivazione
+periodica basata su clock esterno, cosa alla quale non ci si sarebbe
+arrivati senza supporto esterno.
+
+\subsection{Stato della documentazione ufficiale}
+Lo stesso sviluppatore, però, ha anche consigliato di seguire i manuali
+ufficiali per capire meglio il funzionamento del sistema e per avere
+un'idea più chiara di come vadano sviluppati i nuovi blocchi per \SciCos{}.
+
+Era stato già utilizzato un manuale ufficiale\cite{bib:SciCosMan1}, fornito
+dal relatore, il quale conteneva un capitolo per lo sviluppo di nuovi
+blocchi lungo una decina di pagine con solo due esempi, un listato della
+struttura \cypher{scicos\_block} e la descrizione di solo una parte dei
+parametri utilizzati.
+
+\graffito{La seconda edizione del libro}
+Lo sviluppatore, comunque, ha consigliato l'utilizzo della nuova versione
+del manuale\cite{bib:SciCosMan2} in quanto la quale conteneva un capitolo
+``aggiornato'' completamente dedicato allo sviluppo di blocchi in
+\techname{C}.
+Scoraggiati dal costo del manuale, 60€, si è deciso di cercare una versione
+digitale in internet per accertarsi che l'acquisto avrebbe avuto l'impatto
+desiderato sullo svilupppo dei blocchi. Dopo un'attenta lettura queste
+aspettative sono state deluse, in quanto l'aggiornamento prevedeva soltanto
+la sostituzione del listato della struttura con un paragrafo contenente
+meno dettagli su di esso di quanti non fossero presenti nella vecchia
+edizione. Oltre a questo i tipi dichiarati per i vari campi della struttura
+erano di tipi differenti tra una versione ed un'altra.
+
+\graffito{Il tutorial presente sul sito ufficiale}
+Per ovviare al problema si è deciso, in principio, di seguire un tutorial
+sulla creazione di blocchi collegati a funzioni scritte in \techname{C}
+presente sul sito ufficiale\cite{bib:ScicosCTutorial}. La lettura di questo
+tutorial ha reso le cose ancora più confusionarie in quanto scritto da una
+persona che, avendo necessità di mettere per iscritto i passaggi fatti per
+la creazione dei propri blocchi\footnote{Per avere un esempio in futuro in
+caso dovesse crearne altri}, ha deciso di scrivere un tutorial. Questa
+scelta, come si può leggere alla pagina $3$ del tutorial, è stata inoltre
+influenzata dalla documentazione ufficiale di \SciCos{}, la quale
+``manca dolorosamente di esempi completi con descrizioni approfondite dei
+passaggi da intraprendere''.
+
+\graffito{La documentazione dei corsi di formazione del 2008}
+Infine si è deciso di utilizzare la documentazione ufficiale distribuita
+durante i corsi di formazione per sviluppatori di \SciCos{} del
+2008\cite{bib:FormationMars}. Al
+loro interno erano presenti vari dettagli mai accennati prima nelle altre
+documentazioni\footnote{Cosa che fa riflettere sul perché gli autori del
+libro non abbiano deciso di aggiungere anche quei dettagli nella loro
+pubblicazione}, tra cui il metodo di memorizzazione delle matrici
+all'interno degli array di input ed output della struttura
+\cypher{scicos\_block}.
+
+Forti di queste nuove conoscenze si è continuato con lo sviluppo dei vari
+blocchi, fino a che non si è incappati con un errore dato
+dall'interpretazione dei dati.
+
+Secondo due delle documentazioni ufficiali\footnote{Più precisamente il
+libro Modeling and Simulation in Scilab/Scicos with ScicosLab 4.4 ed i
+documenti dei corsi di formazione} i dati delle porte in input ed output
+vengono memorizzati all'interno di array di puntatori a \cypher{void}, il
+che permetterebbe la memorizzazione di \codeconst{int} e \codeconst{float}
+nello stesso array.
+
+Visto il comportamento del programma\footnote{E ciò che era presente nella
+prima versione del manuale ufficiale}, però, si è deciso di andare più a
+fondo con la questione ritornando nel codice sorgente. Trovata la
+dichiarazione della struttura si è venuti a sapere che il tipo dei dati
+delle porte in input ed output è \emph{sempre} \codeconst{float}, a
+differenza di quanto specificato nelle ultime versioni della documentazione
+ufficiale.
+
+Quindi mi sento di dire che, per quanto siano presenti delle documentazioni
+da oltre $300$ pagine, queste sono improntate solamente all'utilizzo del
+software e non allo svilupppo di nuove funzionalità, rendendo un compito
+già difficile quasi impossibile.
+
+\cleardoublepage

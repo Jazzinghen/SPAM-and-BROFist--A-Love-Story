@@ -202,12 +202,12 @@ rappresentare un device \techname{BlueTooth} all'interno del progetto
 \BROFist{}, la quale è rappresentata nel listato \ref{lst:BROToothS}
 
 \begin{figure*}[htbp]
-    \begin{lstlisting}[caption=Sample Task-Alarm declaration,
+    \begin{lstlisting}[caption=BlueTooth Device Identification Structure,
                        label=lst:BROToothS]
 typedef struct {
-    /** Human Readable Name (As set on the Device). */
+    /* Human Readable Name (As set on the Device). */
     char       name[248];      
-    /** Mac address stored in a bdaddr_t variable */
+    /* Mac address stored in a bdaddr_t variable */
     bdaddr_t   mac;             
 } bro_bt_device_t;
 
@@ -248,9 +248,81 @@ Questo modulo non contiene funzioni pubbliche, in quanto il file
 \techname{.c} ad esso collegato fa solo da \emph{main} per il server.
 
 Siccome abbiamo già parlato della struttura dei \emph{BROFists} nel paragrafo
-\ref{sec:BROStruct} quì metteremo il codice utilizzato per 
+\ref{sec:BROStruct} quì metteremo il codice utilizzato per la loro
+dichiarazione \ref{lst:BROFistDec}, oltre che le dichiarazioni necessarie
+per il funzionamento del server \ref{lst:ServerDecs}.
 
-\section{Dipendenze funzionali del Server}
+\begin{figure*}[htbp]
+    \begin{lstlisting}[caption=BROFist Structure Declaration,
+                       label=lst:BROFistDec]
 
+typedef struct {
+    /*Operation to request on the given port.*/
+    uint8_t operation;
+    /*On wich port is installed the Sensor/Servo Motor we want to
+     *interact with.
+     */
+    uint8_t port;
+    /*The data to use in coordination with the given operation.*/
+    float data;
+} __attribute__((__packed__)) bro_fist_t;
+
+    \end{lstlisting}
+\end{figure*}
+
+\begin{figure*}[htbp]
+    \begin{lstlisting}[caption=BROFist Server Fundamental Declarations,
+                       label=lst:ServerDecs]
+/*Server path for the UNIX socket.*/
+#define SERVER_PATH             "/tmp/BROFist"
+/*Number of simultaneous operations to send/recv.*/
+#define BUFFER_SIZE             7
+/*The value that has to be sent to stop the server.*/
+#define BRO_END_COMMUNICATION   255
+    \end{lstlisting}
+\end{figure*}
+
+Inoltre è presente anche la dichiarazione di una struttura necessaria per
+la comunicazione con \nxtOSEK{}, in quanto i device drivers inclusi per il
+controllo delle comunicazioni \techname{BlueTooth} richiedono che nei primi
+$2$ bytes sia presente la quantità di byte inviati\footnote{Non inclusi i
+$2$ bytes per la dichiarazione della dimensione.}. Per questo si è deciso
+di utilizzare una struttura che contenesse \codeconst{BUFFER_SIZE}
+\emph{BROFists} ed un \codeconst{uint16_t} che contenesse la dimensione
+dei dati iniviati\footnote{Inoltre, per fare in modo che non ci fossero
+problemi di compatibilità tra le piattaforme si è deciso di utilizzare
+\codeconst{__attribute__((__packed__))}, attributo che non permette il
+padding all'interno della struttura}. La struttura è contenuta in
+\ref{lst:BROFistsS}
+
+\begin{figure*}[htbp]
+    \begin{lstlisting}[caption=BROFist Server Fundamental Declarations,
+                       label=lst:BROFistsS] 
+typedef struct {
+    /*  Size of the combined BROFists */
+    uint16_t size;
+    /*  Set of Operations to send to the SPAM. */
+    bro_fist_t packets[BUFFER_SIZE];
+} __attribute__((__packed__)) bro_spam_fists_t;
+    \end{lstlisting}
+\end{figure*}
+
+
+\subsection[bro\_opts]{bro\_opts: Parsing delle Opzioni}
+Questo modulo contiene le funzioni per il parsing delle opzioni passate al
+server ed una struttura che contiene tutte le opzioni da passare al server
+per il suo funzionamento.
+
+Per ora la struttura contiene soltanto il \emph{MAC Address}, in quanto non
+è necessario l'utilizzo di altre opzioni, però mantenere tutte le
+informazioni per il funzionamento in una struttura è un approccio
+intelligente in quanto, quando si renderà necessaria un'aggiunta di
+funzionalità, non sarà necessario un cambiamento completo del codice
+utilizzato per passare le informazioni di constesto.
+
+L'unica funzione pubblica di questo modulo è \linebreak \codeconst{int bro_opts_parse
+(bro_opts_t *, int, char * const)}, la quale prende in input i dati passati
+al programma via linea di comando e li interpreta attraverso l'utilizzo di
+\techname{getopt}.
 
 \cleardoublepage
