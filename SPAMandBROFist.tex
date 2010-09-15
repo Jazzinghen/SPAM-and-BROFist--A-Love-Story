@@ -11,12 +11,19 @@
 \usepackage{graphicx}
 \usepackage{indentfirst}
 
+\hypersetup{pdfborder={0 0 0}}
+
 \usepackage{allrunes}
 
 \usepackage{color}
 \definecolor{Brown}{cmyk}{0,0.81,1,0.60}
 \definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
 \definecolor{CadetBlue}{cmyk}{0.70,0.57,0.23,0}
+
+% includes official (and very dirty) stuff
+%\input{Official/packages}
+
+\usepackage[final]{pdfpages}
 
 \usepackage{listings}
 \lstset{language=[ansi]C,
@@ -46,6 +53,11 @@
 \author{Michele "Jazzinghen" Bianchi}
 \title{Sviluppo di Strumenti didattici per la programmazione Embedded}
 \begin{document}
+
+    %\input{Official/unitnheader}
+
+    \includepdf[pages=1]{Official/cover.pdf}
+
     \tableofcontents
     \cleardoublepage
     
