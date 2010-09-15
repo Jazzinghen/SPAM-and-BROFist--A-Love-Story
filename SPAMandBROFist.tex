@@ -25,6 +25,7 @@
 
 \usepackage[final]{pdfpages}
 
+
 \usepackage{listings}
 \lstset{language=[ansi]C,
         frame=tRBl, %
@@ -48,6 +49,9 @@
     configuration, implementation, components, as, module, interface,
     uses, provides, bro_bt_device_t, bdaddr_t, scicos_block}
 }
+
+\renewcommand*\lstlistingname{Listato}
+
 \input{VariousStuff/defines}
 \usepackage{}
 \author{Michele "Jazzinghen" Bianchi}
@@ -61,7 +65,7 @@
     \tableofcontents
     \cleardoublepage
     
-    %\input{Chapters/ThanksStuff}
+    \input{Chapters/ThanksStuff}
     
     \part{Introduzione e Nozioni di base}
     \input{Chapters/Intro}
@@ -72,7 +76,13 @@
     \input{Chapters/BROFistServer}
     \input{Chapters/SCICOSBlocks}
 
-    \part{Apendici}
+    \part{Appendici}
+    \appendix
+    
+    \input{Chapters/UsingSciCosBlocks}
+    \input{Chapters/Compiling}
+
+    \backmatter 
     \addcontentsline{toc}{chapter}{\bibname}
     
     \input{VariousStuff/bibliography}
