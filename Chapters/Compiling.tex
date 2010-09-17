@@ -1,3 +1,68 @@
 \chapter{Compilare BROFist}
+In questo capitolo vedremo velocemente come fare per compilare ogni parte
+del progetto e delle librerie necessarie per questa operazione.
+
+\section{BROFist Server}
+La compilazione del server, una volta installate le dipendenze è una cosa
+facile quanto fare
+\begin{verbatim}
+cd src
+make all
+\end{verbatim}
+Verrà creato un eseguibile chiamato \cypher{BROFist} nella cartella ed il
+server sarà pronto per l'utilizzo.
+
+\section{Blocchi per SciCos}
+Per i blocchi di \SciCosLab{} la storia potrebbe essere semplice come per
+il server, visto che ho incluso un file di script che contiene tutte le
+operazioni che vanno fatte per preparare l'ambiente, come visto nella
+sezione \ref{sec:SciComp}, però c'è un problema dato dalla mancanza di
+flessibilità di \SciCosLab{}.
+
+Come si può notare leggendo il file di script \cypher{BRO\_Loader.sce} la
+prima riga contiene il seguente ``comando'':
+\begin{verbatim}
+base = "/home/jazzinghen/Documents/Tesi/BROFist/scicos/";
+\end{verbatim}
+Il quale indica dove si trovano i codici sorgente e le definizioni dei
+singoli blocchi. Purtroppo non ho trovato maniera più ``pulita'' di
+scriverlo. Il problema derviva dal fatto che \SciCosLab{} setta come
+cartella di lavoro quella dalla quale è stato eseguito, perciò sarebbe
+necessario ogni volta settare il \foreignword{Working Path} per compilare
+tutto, oppure eseguire \SciCosLab{} ogni volta dalla cartella corretta.
+
+Per facilità, dunque, basta modificare il file \cypher{BRO\_Loader.sce} e
+modificare il valore di \cypher{base} con la cartella dove sono presenti i
+files per \SciCosLab{} e quindi eseguire \cypher{exec \{Path del progetto
+BROFist\}\\scicos\\BRO\_Loader.sce}.
+
+\section{Immagine per NXT}
+Anche la compilazione di \nxtOSEK{} potrebbe dare dei problemi. Una volta
+che è stato settato l'ambiente di compilazione di \nxtOSEK{} bisognerà
+indicare all'intero del \cypher{Makefile} la posizione della configurazione
+per la compilazione di \nxtOSEK{}. Per fare ciò basterà modificare la riga
+\begin{verbatim}
+include ../../spamOSEK/ecrobot/ecrobot.mak
+\end{verbatim}
+
+Una volta settato questo bisognerà fare
+\begin{verbatim}
+cd spam
+make all
+sh ./rxeflash.sh
+\end{verbatim}
+Per compilare l'immagine e caricarla sull'unità \techname{NXT}.
+
+\section{Dipendenze}
+Il progetto necessità di tre cose, di cui le prime due sono ovvie:
+\begin{itemize}
+    \item \nxtOSEK{}
+    \item \SciCosLab{}
+    \item \techname{LibBluetooth}
+\end{itemize}
+L'ultimo è sempre presente in un sistema \techname{*NIX} in quanto è il suo
+\foreignword{Protocol Stack} ufficiale per \techname{BlueTooth}. Per la
+compilazione, però, è necesario disporre della versione \emph{Dev} del
+pacchetto.
 
 \cleardoublepage

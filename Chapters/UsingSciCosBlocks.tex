@@ -8,7 +8,156 @@ programmatore, però, alcune delle funzionalità potrebbero risultare
 complicate da comprendere, perciò verrà redatto un breve \emph{tutorial}
 per l'utilizzo dei blocchi per \SciCos{} del progetto \BROFist{}.
 
-\section{Preparazione dell'ambiente di sviluppo}
+\section{Preparazione dell'ambiente di sviluppo}\label{sec:SciComp}
+Prima dell'utilizzo dei blocchi bisogna preparare l'ambiente per l'utilizzo
+dei blocchi.
+
+Ogni volta che si vule collegare una funzione scritta in \techname{C} a
+\SciCosLab{} è necessario prima farla compilare al software, il quale
+creerà delle librerie create apposta per la loro interazione con
+\SciCosLab{}. Per fare ciò bisogna chiamare il comando
+\cypher{ilib\_for\_link}, il quale compila queste librerie, quindi
+collegare in \SciCosLab{} queste librerie alle funzioni volute con
+\cypher{link}.
+
+In questa maniera inseriremo le funzioni all'interno dell'ambiente, facendo
+in modo che \SciCosLab{} possa collegare determinate chiamate alle funzioni
+contenute nelle librerie.
+
+Il passo successivo è quello di aggiungere all'ambiente le definizioni dei
+blocchi di controllo sviluppati appositamente per queste funzioni (In
+quanto così potrebbero venir chiamate solo da \techname{SciLab}). Per fare
+questo bisogna caricare i file contenenti le definizioni con il comando
+\cypher{exec}.
+
+Una volta fatto tutto il procedimento si potrà procedere alla
+modellizzazione grafica, spiegata sotto.
+
+\graffito{Lo script di caricamento}
+Per facilitare questo procedimento è stato aggiunto un file di script per
+\SciCosLab{}, il quale fa tutte queste operazioni in ordine. Per eseguire
+questo file di scripting basta scrivere nella finestra di \techname{SciLab}
+\cypher{exec BRO\_loader.sce}. Questo compilerà, se necessario, tutte le
+librerie, farà il \foreignword{linking} delle funzioni ad esse associate e
+quindi caricherà le definizioni di tutti i blocchi scritti apposta per il
+progetto \BROFist{}.
+
+\section{Utilizzare i blocchi per SciCos}
+Una volta fatto il caricamento ed entrati all'interno del modellatore
+grafico bisogna caricare i blocchi e collegarli in maniera corretta per il
+loro utilizzo.
+
+Per caricare un blocco del progetto basta, dentro \SciCos{}, andare sotto
+\emph{Edit $\rightarrow{}$ Add new block} e quindi inserire il nome del
+blocco che si vuole aggiungere al modello.
+
+Come prima cosa andrebbe caricato il blocco \emph{BRO\_Controller}, il
+quale andrà collegato a tutti i vari blocchi che effettuano le connessioni
+(Immagine \ref{img:Tut01}).
+
+\image  {Images/Tutorial/Step01}
+        {Inserimento del blocco \emph{BRO\_Controller}}
+        {.8}
+        {img:Tut01}
+
+Una volta fatto questo bisognerà aggiungere un blocco per la comunicazione
+con lo \SPAM{}. Questo blocco potrà essere o un \emph{SENS\_Disp} o un
+\emph{MOTOR\_Disp}. Noi faremo un esempio utilizzando un
+\foreignword{dispatcher} per i motori. Una volta posto il blocco
+nell'editor dovremmo provvedere a collegare alla prima porta in input di
+questo blocco la porta in uscita del \foreignword{controller} per le
+comunicazioni (Immagine \ref{img:Tut02}).
+
+\image  {Images/Tutorial/Step02}
+        {Inserimento del blocco \emph{MOTOR\_Disp}}
+        {.8}
+        {img:Tut02}
+
+Il prossimo passo sarà aggiungere, configurare e collegare i blocchi
+per le richieste, ovvero \emph{SPAM\_Sensor}. Una volta aggiunto allo
+schema basterà configurarlo aprendo le proprietà del blocco ed utilizzare i
+valori come descritto nella sezione \ref{sec:SPAMSensS}. Una volta ripetuti
+tutti questi passaggi basterà collegare tutte le porte restanti del blocco
+di \foreignword{dispatch} con un blocco contentente $[0;0;0]$(Immagine
+\ref{img:Tut03}).
+
+\image  {Images/Tutorial/Step03}
+        {Inserimento dei blocchi \emph{SPAM\_Sensor}}
+        {.8}
+        {img:Tut03}
+
+Siccome \SciCos{} simula dei sistemi discreti sarà necessario collegare i
+blocchi che effettuano le comunicazioni ad un timer in quanto, altrimenti,
+non avverrebbe una comunicazione continua. Non bisogna preoccuparsi di una
+possibile desincronizzazione tra il clock ed il blocco di comunicazione,
+visto che le chiamate usate nei blocchi sono bloccanti, quindi finchè non
+viene ricevuta una risposta il sistema non chiama i blocchi successivi, tra
+i quali figurano quelli di clock (Immagine \ref{img:Tut04}
+
+\image  {Images/Tutorial/Step04}
+        {Collegamento di un clock al blocco \emph{SENS\_Disp}}
+        {.8}
+        {img:Tut04}
+
+Le porte in uscita, come già detto, conterranno i dati ricevuti dallo
+\SPAM{} in base alle richieste settate sulle porte in entrata.
+
+Per quanto riguarda il controllo dei motori, invece, c'è una leggera
+differenza, ovvero come gestire i parametri che vanno inviati ai motori. Il
+procedimento è del tutto simile a quello per i sensori, con la differenza
+che, al posto di un blocco \emph{SENS\_Disp} serve un blocco
+\emph{MOTOR\_Disp}, il quale va configurato tramite l'uso di blocchi
+\emph{SPAM\_Motor} (Immagine \ref{img:Tut05}.
+
+\image  {Images/Tutorial/Step05}
+        {L'utilizzo dei blocchi per il controllo dei motori}
+        {.8}
+        {img:Tut05}
+
+Come si potrà notare dall'immagine i blocchi di codifica dei motori hanno
+una porta di input alla quale collegare il parametro da inviare ai motori.
+
+\section{Far partire la simulazione}
+Una volta pronti a far partire la simulazione bisogna far partire il server
+collegandolo allo \SPAM{}, sul quale bisognerà aver fatto partire
+l'applicazione sviluppata appositamente.
+
+Per fare questo basta andare nella cartella del server e farlo partire con
+il seguente comando:
+\begin{verbatim}
+./BROFist --mac=01:23:45:67:89:AB
+\end{verbatim}
+Dove il valore dopo l'opzione \cypher{--mac} è il \emph{MAC Address}
+dello \SPAM{} al quale connettersi. Una volta connesso allo
+\SPAM{}\footnote{Cosa che viene indicata sul display dello \SPAM{} con un
+\cypher{[BT]}} sulla linea di comando comparirà la scritta
+\begin{verbatim}
+Ready for client connect().
+\end{verbatim}
+Adesso si può far partire la simulazione sa \SciCos{}. Una volta terminata
+il server si chiuderà da solo e bisognerà riavviare lo \SPAM{} premendo il
+tasto verso sinistra, riportandolo alla schermata di \nxtOSEK{}.
+
+\section{Le opzioni del server per BROFist}
+Il server ha varie opzioni, le quali possono venir lette utilizzando
+l'opzione \cypher{-h} quando si esegue il server.
+
+Le opzioni disponibili sono le seguenti:
+\begin{itemize}
+    \item \cypher{-m \{Mac Address\}} oppure {--mac=\{Mac Address\}}:
+        Connettersi al \emph{MAC Address} specificato, il quale dovrà venir
+        inserito nella forma \emph{XX:XX:XX:XX:XX:XX}.
+    \item \cypher{-l} oppure \cypher{--list-devices}: Fare uno scan
+        \techname{BlueTooth} e stampare a video tutti i device in range,
+        indicandone nome e \emph{MAC Address}
+    \item \cypher{-s \{BlueTooth Name\}} oppure
+        \cypher{--select-device=\{BlueTooth Name\}}: Connettersi al device
+        \techname{BlueTooth} con il nome fornito. Se sono presenti più
+        device con lo stesso nome il server si connetterà al primo
+        disponibile.
+    \item \cypher{-h} oppure \cypher{--help}: Stampare a video l'help del
+        server, il quale riassume le opzioni disponibili.
+\end{itemize}
 
 
 \cleardoublepage
