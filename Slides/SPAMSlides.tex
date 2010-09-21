@@ -7,12 +7,13 @@
 \mode<presentation>
 {
   \usetheme{Warsaw}
+  %\usetheme{Ilmenau}
   % or ...
 
   % or whatever (possibly just delete it)
    \usefonttheme[onlylarge]{structuresmallcapsserif}
 
-    \usecolortheme{seahorse}
+    \usecolortheme{beetle}
 
     \setbeamerfont{title}{shape=\itshape,family=\rmfamily}
 
@@ -136,6 +137,11 @@ per la Programmazione Embedded}
             \item Applicazione Server che comunica col Client e con SciCos
             \item Blocchi d'interfaccia per SciCos
         \end{itemize}
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=.8\textwidth]{../Images/BROFistInteractions.png}
+        \end{figure}
     }
 
    \subsection{Client}
@@ -156,149 +162,103 @@ per la Programmazione Embedded}
         \end{itemize}
        \end{block}
        
-}
-  \subsection{Population}
+    }
+  
+  \subsection{Server}
 	\frame{
-		\frametitle{Population Algorithm}
-   	\begin{block}{Funzionamento:}
+		\frametitle{Server}
 		\begin{itemize}
-		\item ogni nodo parte con un token
-		\item ad ogni incontro viene scelto un nodo (probabilità 50/50)
-		\item il nodo scelto prende possesso dei token dell'altro
-	    	\item alla fine i token finiscono in un unico nodo
-		\item i nodi tengono memoria del numero massimo di token incontrati
+         \item Si connette a SPAM via Bluetooth
+         \item Attende connessioni da parte di SciCos via IPC Socket
+         \item Fa da bridge tra SciCos e SPAM
 	  	\end{itemize}
-	\end{block}
+        Permette estensioni di facile sviluppo.
 	}
+  \subsection{SciCos}
 	\frame{
-		\frametitle{C-Population Algorithm}
-   \begin{block}{Caratteristiche:}
-	\begin{itemize}
-	 \item variazione di Population Algorithm
-	 \item probabilità di assegnamento proporzionale all'attività
-  	\end{itemize}
-   \end{block}
-	\begin{block}{Conseguenze}
-	\begin{itemize}
-	 \item i token finiscono nei nodi più attivi
-    \item maggiore velocità di convergenza
-	\end{itemize}
-	\end{block}
+		\frametitle{SciCos}
+        SciCos è il pacchetto di modellazione grafica di sistemi discreti
+        di SciCosLab.
+        \begin{columns}
+        \column{.45\textwidth}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[scale=.25]{../Images/Yadda.png}
+        \end{figure}
+        \column{.05\textwidth}
+        \column{.5\textwidth}
+        \begin{itemize}
+            \item Alternativa Open Source a Matlab
+            \item Estensibile tramite la scrittura di funzioni in C
+            \item Multipiattaforma
+        \end{itemize}
+
+        \end{columns}
 	}
-   \subsection{Two Phases}
+   \subsection{Blocchi BROFist}
 	\frame{
-		\frametitle{Two Phases Algorithm}
-		\begin{block}{Caratteristiche:}
-	\begin{itemize}
-	 \item variazione di C-Population Algorithm
-	 \item interviene in caso di stallo di C-Population
-	 \item estrae e firma i token
-	 \item diffonde le coppie (id-token)
-  	\end{itemize}
-\end{block}
-	 \begin{block}{Conseguenze:}
-	\begin{itemize}
-	 \item aumento di traffico
-	 \item maggiore robustezza
-	 \item migliori performance
-  	\end{itemize}
-\end{block}
+		\frametitle{Blocchi d'interfaccia per SciCos}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=1\textwidth]{../Images/SciCosScreen.png}
+        \end{figure}
+
+%        \begin{columns}
+%            \column{.425\textwidth}
+%              \begin{itemize}
+%                \item BRO\_Controller
+%                \item SENS\_Disp
+%                \item MOTOR\_Disp
+%              \end{itemize}
+%            \column{.05\textwidth}
+%            \column{.425\textwidth}
+%              \begin{itemize}
+%                \item SPAM\_Sensor
+%                \item SPAM\_Motor
+%              \end{itemize}
+%        \end{columns}
 	}
-   \section{Prestazioni}
-   \subsection{Random Way Mobility}
+   \section{Conclusioni}
+   \subsection{Sviluppi Futuri}
 	\frame{
-		\frametitle{Risultati sul modello Random Way Mobility}
-		\begin{block}{Caratteristiche del modello:}
-		\begin{itemize}
-		\item nodi in movimento in un playground
-		\item attività uniforme
-		\end{itemize}
-		\end{block}
-		\begin{block}{Tempi di convergenza medi}
-\begin{center}		\begin{tabular}{|c||c|}
-			\hline
-			\textbf{Pairwise Averaging} &\textbf{Population}\\ 
-			\hline
-			 $ 8.00\pm0.00\e3 s$   & $ 2.10\pm0.23\e5 s$\\  
-			\hline
-			\hline
-			\textbf{C-Population} & \textbf{Two-Phases}\\
-			\hline
-			$ 2.06\pm0.24\e5 s$  & $2.21\pm0.09\e4 s$\\ 
-			\hline
-		\end{tabular}
-\end{center}		\end{block}
-		\begin{block}{Considerazioni}
-	\begin{itemize}
-		\item Pairwise Averaging è il più veloce
-		\item C-Population non guadagna rispetto a Population
-	\end{itemize}
-		\end{block}
+		\frametitle{Sviluppi Futuri}
+		\begin{columns}
+            \column{.55\textwidth}
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=1\textwidth]{../Images/TheBROFistStructureSlides.png}
+            \end{figure}
+
+            \column{.05\textwidth}
+            \column{.4\textwidth}
+              \begin{itemize}
+                \item Aggiunta del supporto USB
+                \item Creazione di applicazioni in locale che sfruttano il
+                    Server
+                \item Creazione di applicazioni remote come un sito web
+                    che, attraverso il server, controlla un NXT da remoto
+              \end{itemize}
+        \end{columns}
 	}
-   \subsection{Reality Mining}
-	\frame{
-		\frametitle{Risultati sulla traccia Reality Mining}
-		\begin{block}{Caratteristiche della traccia:}
-		\begin{itemize}
-		\item registrata dal MIT  
-		\item attività poco uniforme
-		\end{itemize}
-		\end{block}
-		\begin{block}{Tempi di convergenza medi}
-\begin{center}		\begin{tabular}{|c||c|}
-			\hline
-			\textbf{Pairwise Averaging} &\textbf{Population}\\ 
-			\hline
-			  $ 2.47\pm0.16\e8 ms$   & $ 2.19\pm0.40\e9 ms$\\  
-			\hline
-			\hline
-			\textbf{C-Population} & \textbf{Two-Phases}\\
-			\hline
-			$ 2.16\pm0.19\e7 ms$  & $2.24\pm0.05\e7 ms$\\ 
-			\hline
-		\end{tabular}
-\end{center}		\end{block}
-		\begin{block}{Considerazioni}
-	\begin{itemize}
-		\item C-Population diventa il più veloce
-		\item Pairwise Averaging soffre la differenza di attività
-	\end{itemize}
-		\end{block}
-	}
-   \subsection{Perdita di messaggi}
-	\frame{
-		\frametitle{Effetti della perdita di messaggi}
-		\begin{block}{Sviluppo di un incontro}
-			\begin{enumerate}
-				\item Nodo 1 manda i suoi dati
-				\item Nodo 2 riceve e risponde
-				\item Nodo 2 esegue l'algoritmo
-				\item Nodo 1 riceve ed esegue l'algoritmo
-			\end{enumerate}
-		\end{block}
-		\begin{itemize}
-			\item Se si perde il messaggio di risposta l'algoritmo viene eseguito solo su un nodo.
-			\item Si creano degli errori nella stima
-		\end{itemize}
-	}
-	\frame{
-		\frametitle{Pairwise Averaging su Random Way Mobility}
-		\begin{figure}
-		\begin{center}
-		\includegraphics[scale=0.45]{aggr.png}
-		\end{center}
-		\end{figure}
-	}
-   \subsection{Conclusioni}
-	\frame{
-		\frametitle{Conclusioni ottenute}
-		\begin{block}{Conclusioni:}
-		\begin{itemize}
-			\item Two-Phases e Pairwise Averaging sono i più robusti
-			\item Pairwise Averaging più veloce in reti uniformi
-			\item Two-Phases più veloce in reti non uniformi
-			\item C-Population poco robusto, ma veloce in reti non uniformi
-		\end{itemize}
-		\end{block}
-	}
+
+    \subsection{Conclusioni}
+     \frame{
+        \frametitle{Contributo della tesi}
+        \begin{itemize}
+            \item Client per NXT che comunica col PC,
+                permettendo il controllo remoto, anche attraverso PID
+                Controller
+            \item Server che comunica tra NXT e PC, il quale può venir
+                esteso per permettere nuove connessioni
+            \item Blocchi di Interfaccia per SciCos per modellare dei
+                sistemi discreti per NXT con un feedback reale
+        \end{itemize}
+     }
+
+
+   \frame{
+       \begin{center}
+            \Huge{Domande?}
+       \end{center}
+   }
 \end{document}
